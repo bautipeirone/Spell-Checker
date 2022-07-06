@@ -50,4 +50,9 @@ void hashtable_remove(HashTable table, void *data);
 */
 void hashtable_resize(HashTable table);
 
+/*
+ * Applies visit to every non NULL element on the table
+*/
+void hashtable_iterate(HashTable table, VisitFunctionExtra visit, void *extra);
+
 #endif /* __HASHTABLE_H__ */

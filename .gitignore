@@ -1,4 +1,16 @@
+# Ejecutables
+main
+sc
+tests
+
+# Archivos objeto
+src/*.o
+structures/*.o
+
+# Otros
 .DS_Store
 .vscode
 .git
 *.dSYM
+input.txt
+output.txt

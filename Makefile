@@ -3,24 +3,20 @@
 # Compilador y banderas
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -std=c99
-BIN = sc
+BIN = main
 
 # Archivos fuente
-MAIN = src/main
-DICTIONARY = src/dictionary
-CHECKER = src/checker
-#IO = src/io
+SOURCE = $(wildcard src/*.c)
+SOURCE_O = $(SOURCE:c=o)
 
-HASHTABLE = structures/hashtable
-TRIE = structures/trie
+STRUCTURES = $(wildcard structures/*.c)
+STRUCTURES_O = $(STRUCTURES:c=o)
 
-SOURCE = $(DICTIONARY).o $(CHECKER).o
-STRUCTURES = $(HASHTABLE).o $(TRIE).o
-TESTS = tests/main.c 
+TESTS = tests/main.c
 
 # Compilar el programa
-all: $(MAIN).o $(SOURCE) $(STRUCTURES)
-	$(CC) $(CFLAGS) $^ -o $(BIN)
+all: $(SOURCE_O) $(STRUCTURES_O)
+	$(CC) $(CFLAGS) $^ utils.c -o $(BIN)
 
 # Crear .o desde archivos .c
 %.o: %.c
@@ -29,8 +25,7 @@ all: $(MAIN).o $(SOURCE) $(STRUCTURES)
 # Compilar para depuracion
 .PHONY: debug
 debug:
-	$(CC) -g $(CFLAGS) $(MAIN).c $(DICTIONARY).c \
-	$(CHECKER).c $(HASHTABLE).c $(TRIE).c -o $(BIN)
+	$(CC) -g $(CFLAGS) $(SOURCE) $(STRUCTURES) utils.c -o $(BIN)
 
 # Remover archivos .o, ejecutables, etc
 .PHONY: clean

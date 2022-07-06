@@ -5,12 +5,9 @@
 /*  OPEN ADDRESSING HASH TABLES  */
 /* LINEAR PROBING IMPLEMENTATION */
 
-/**
- * Cells in which the hash table data will be stored in
- */
-typedef struct {
-  void *data;
-} HashBox;
+static inline void* id(void *p) { return p; }
+
+static inline void null(void *p) { (void) p; return; }
 
 /*
  * Pointer to a special location to indicate REMOVED elements
@@ -21,7 +18,7 @@ static void* REMOVED;
  * Main structure for the hash table
  */
 struct _HashTable {
-  HashBox *elems;
+  void **elems;
   unsigned num_elems;
   unsigned size;
   CopyFunction copy;
@@ -39,7 +36,7 @@ HashTable hashtable_init(unsigned size, CopyFunction copy,
 
   HashTable table = malloc(sizeof(struct _HashTable));
   assert(table != NULL);
-  table->elems = malloc(sizeof(HashBox) * size);
+  table->elems = malloc(sizeof(void*) * size);
   assert(table->elems != NULL);
   table->num_elems = 0;
   table->size = size;
@@ -49,7 +46,7 @@ HashTable hashtable_init(unsigned size, CopyFunction copy,
   table->hash = hash;
 
   for (unsigned idx = 0; idx < size; ++idx)
-    table->elems[idx].data = NULL;
+    table->elems[idx] = NULL;
 
   return table;
 }
@@ -72,11 +69,10 @@ static inline float charge_factor(HashTable table) {
  * Destroys the table
  */
 void hashtable_free(HashTable table) {
-
   // Destroy each element on the table
   for (unsigned idx = 0; idx < table->size; ++idx)
-    if (table->elems[idx].data != NULL)
-      table->destroy(table->elems[idx].data);
+    if (table->elems[idx] != NULL)
+      table->destroy(table->elems[idx]);
 
   // Free the boxes and the table
   free(table->elems);
@@ -100,19 +96,19 @@ void hashtable_insert(HashTable table, void *data) {
   // Search for an empty position checking one by one
   for (unsigned i = 0; i < table->size && !inserted; ++i) {
     // Insert data if empty or if previous data in the cell was REMOVED
-    if (table->elems[idx].data == NULL || table->elems[idx].data == REMOVED) {
+    if (table->elems[idx] == NULL || table->elems[idx] == REMOVED) {
       table->num_elems++;
-      table->elems[idx].data = table->copy(data);
+      table->elems[idx] = table->copy(data);
       inserted = 1;
     // Overwrite data if already in the table
-    } else if (table->cmp(table->elems[idx].data, data) == 0) {
-      table->destroy(table->elems[idx].data);
-      table->elems[idx].data = table->copy(data);
+    } else if (table->cmp(table->elems[idx], data) == 0) {
+      table->destroy(table->elems[idx]);
+      table->elems[idx] = table->copy(data);
       inserted = 1;
     }
     idx = (idx + 1) % table->size;
   }
-  return;
+  return ;
 }
 
 void* hashtable_search(HashTable table, void *data) {
@@ -122,10 +118,10 @@ void* hashtable_search(HashTable table, void *data) {
 
   // Stop if NULL is found or every element is checked
   for (unsigned i = 0; !stop && i < table->size; ++i) {
-    if (table->elems[idx].data == NULL)
+    if (table->elems[idx] == NULL)
       stop = 1;
-    else if (table->cmp(table->elems[idx].data, data) == 0)
-      return table->elems[idx].data;
+    else if (table->cmp(table->elems[idx], data) == 0)
+      return table->elems[idx];
     idx = (idx + 1) % table->size;
   }
   return NULL;
@@ -136,15 +132,15 @@ void hashtable_remove(HashTable table, void *data) {
   unsigned idx = table->hash(data) % table->size;
 
   for (unsigned i = 0; i < table->size; ++i) {
-    if (table->elems[idx].data == NULL)
+    if (table->elems[idx] == NULL)
       return;
     // Vaciar la casilla si hay coincidencia.
-    else if (table->cmp(table->elems[idx].data, data) == 0) {
+    else if (table->cmp(table->elems[idx], data) == 0) {
       table->num_elems--;
-      table->destroy(table->elems[idx].data);
+      table->destroy(table->elems[idx]);
       // Assign to the cell the REMOVED symbolic value. The reason why NULL is
       // not used is because NULL indicates the end of search.
-      table->elems[idx].data = REMOVED;
+      table->elems[idx] = REMOVED;
       return;
     }
     idx = (idx + 1) % table->size;
@@ -152,19 +148,33 @@ void hashtable_remove(HashTable table, void *data) {
 }
 
 void hashtable_resize(HashTable table) {
-  HashBox *tmp_elems = table->elems;
+  void **tmp_elems = table->elems;
   unsigned tmp_size = table->size;
   table->size *= 2;
   table->num_elems = 0;
-  table->elems = malloc(sizeof(HashBox) * table->size);
+  table->elems = malloc(sizeof(void*) * table->size);
   assert(table->elems != NULL);
   
+  CopyFunction copy = table->copy;
+  DestroyFunction destroy = table->destroy;
+  table->copy = id;
+  table->destroy = null;
+
   for (unsigned i = 0; i < tmp_size; ++i) {
-    if (tmp_elems[i].data == NULL || tmp_elems[i].data == REMOVED)
+    if (tmp_elems[i] == NULL || tmp_elems[i] == REMOVED)
       continue;
-    hashtable_insert(table, tmp_elems[i].data);
-    table->destroy(tmp_elems[i].data);
+    hashtable_insert(table, tmp_elems[i]);
+    table->destroy(tmp_elems[i]);
   }
 
+  table->copy = copy;
+  table->destroy = destroy;
+
   free(tmp_elems);
+}
+
+void hashtable_iterate(HashTable table, VisitFunctionExtra visit, void *extra) {
+  for (unsigned i = 0; i < table->size; i++)
+    if (table->elems[i] != NULL)
+      visit(table->elems[i], extra);
 }
