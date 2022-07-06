@@ -1,7 +1,17 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
-#define NCHARS 26 // Caracters en el alfabeto sin la ñ
+// Importacion general de librerias
+#include <assert.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+
+#define NCHARS 26 // Cantidad de caracters en el alfabeto sin la ñ
+
+// Numero de sugerencias a hacer por palabra incorrecta
+#define NUM_SUGGESTS 5
 
 // Longitud maxima de una palabra en el diccionario/entrada
 #define MAX_LEN_WORD 35
@@ -17,6 +27,9 @@ typedef void (*DestroyFunction)(void *data);
 
 // Retorna un entero positivo para data
 typedef unsigned (*HashFunction)(void *data);
+
+// Funcion de representacion del dato, con argumento extra
+typedef void (*VisitFunctionExtra)(void *data, void *extra);
 
 /**
  * Funcion de hash para strings propuesta por Kernighan & Ritchie en "The C
