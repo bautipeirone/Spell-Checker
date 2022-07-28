@@ -19,6 +19,17 @@
 */
 void make_suggests(WrongWord word, Trie dictionary);
 
+/*
+ * Algoritmo para obtener distancia de edicion de dos strings.
+ * Nota: Para los casos evidentes de distancia mayor a 3, el algoritmo
+ * se detiene antes de ejecutarse, devolviendo un entero grande
+
+ * Tiempo: O(n * m) donde len(str1) = n y len(str2) = m
+ * Memoria: O(n * m) donde len(str1) = n y len(str2) = m
+*/
+unsigned edit_distance(const char* str1, const char* str2);
+
+unsigned distance(char *str1, char *str2, unsigned len1, unsigned len2);
 
 /*
  * Analiza si una palabra esta en el diccionario, si no lo esta, busca en la
@@ -36,7 +47,5 @@ void check_word(const char* str, HashTable corrected_words, Trie dict);
 HashTable check_file(const char* input, Trie dictionary);
 
 BHeap print_distances(Trie root, char *str, int len);
-
-unsigned distance(char *str1, char *str2, unsigned len1, unsigned len2);
 
 #endif /* __CHECKER_H__ */

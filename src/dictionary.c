@@ -1,6 +1,13 @@
 #include "dictionary.h"
 #include "io.h"
 
+static char* copy_str(const char *str) {
+  char *copy = malloc(strlen(str) + 1);
+  assert(copy != NULL);
+  strcpy(copy, str);
+  return copy;
+}
+
 WrongWord init_wrongword(const char *str) {
   WrongWord w = malloc(sizeof(struct _WrongWord));
   assert(w != NULL);

@@ -1,6 +1,5 @@
 #include "checker.h"
 #include "io.h"
-#include "limits.h"
 
 static inline int min(const int x, const int y) {
   if (x > y)
@@ -130,3 +129,4 @@ BHeap print_distances(Trie root, char *str, int len) {
     if (root->children[i])
       __print_distance(root->children[i], heap, 0, buf, str, len);
 }
+
