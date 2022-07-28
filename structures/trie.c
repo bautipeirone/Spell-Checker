@@ -70,3 +70,22 @@ void trie_destroy(Trie root) {
     trie_destroy(root->children[i]);
   free(root);
 }
+
+void trie_iter_impl(Trie root, int depth, char buf[MAX_LEN_WORD], VisitFunctionExtra visit, void *data) {
+  buf[depth] = root->c;
+  if (root->end_of_word) {
+    buf[depth + 1] = '\0';
+    visit(buf, data);
+  }
+  for (int i = 0; i < NCHARS; ++i) {
+    if (root->children[i] != NULL)
+      trie_iter_impl(root->children[i], depth + 1, buf, visit, data);
+  }
+}
+
+void trie_iter(Trie root, VisitFunctionExtra visit, void *data) {
+  char buf[MAX_LEN_WORD + 1];
+  for (int i = 0; i < NCHARS; ++i)
+    if (root->children[i])
+      trie_iter_impl(root->children[i], 0, buf, visit, data);
+}

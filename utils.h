@@ -16,6 +16,9 @@
 // Longitud maxima de una palabra en el diccionario/entrada
 #define MAX_LEN_WORD 35
 
+// Distancia maxima de busqueda de sugerencias
+#define MAX_SEARCH_DISTANCE 3
+
 // Retorna una copia de dato
 typedef void *(*CopyFunction)(void *data);
 
@@ -28,6 +31,8 @@ typedef void (*DestroyFunction)(void *data);
 // Retorna un entero positivo para data
 typedef unsigned (*HashFunction)(void *data);
 
+typedef void (*VisitFunction)(void *data);
+
 // Funcion de representacion del dato, con argumento extra
 typedef void (*VisitFunctionExtra)(void *data, void *extra);
 
@@ -36,5 +41,10 @@ typedef void (*VisitFunctionExtra)(void *data, void *extra);
  * Programming Language (Second Ed.)".
  */
 unsigned KRHash(char *s);
+
+/*
+ * Retorna una copia del string
+*/
+char* copy_str(const char *str);
 
 #endif /* __UTILS_H__ */

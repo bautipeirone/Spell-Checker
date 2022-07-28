@@ -23,4 +23,6 @@ int trie_search(Trie root, const char* str);
 
 void trie_destroy(Trie root);
 
+void trie_iter(Trie root, VisitFunctionExtra visit, void *data);
+
 #endif /* __TRIE_H__ */
