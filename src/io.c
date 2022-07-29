@@ -47,7 +47,6 @@ void write_correction(WrongWord w, FILE *fp) {
   }
   fputc('\n', fp);
   fputc('\n', fp);
-  free_wrongword(w);
 }
 
 void write_corrections(const char *path, HashTable corrections) {

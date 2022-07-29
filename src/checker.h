@@ -1,6 +1,7 @@
 #ifndef __CHECKER_H__
 #define __CHECKER_H__
 
+#include "../utils.h"
 #include "../structures/hashtable.h"
 #include "../structures/trie.h"
 #include "../structures/gqueue.h"

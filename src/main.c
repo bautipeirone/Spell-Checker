@@ -10,7 +10,7 @@ int main(int argc, const char* argv[]) {
   Trie dict = create_dictionary(dictionary_path);
   HashTable corrections = check_file(argv[1], dict);
   write_corrections(argv[2], corrections);
-
+  
   hashtable_free(corrections);
   trie_destroy(dict);
   return 0;

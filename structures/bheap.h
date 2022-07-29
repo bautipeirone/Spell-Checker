@@ -1,7 +1,7 @@
 #ifndef __HEAP_H__
 #define __HEAP_H__ // Max Binary Heaps
 
-#include "../../utils.h"
+#include "../utils.h"
 
 typedef struct _BHeap {
     void **arr;

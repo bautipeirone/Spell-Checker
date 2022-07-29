@@ -5,10 +5,6 @@
 /*  OPEN ADDRESSING HASH TABLES  */
 /* LINEAR PROBING IMPLEMENTATION */
 
-static inline void* id(void *p) { return p; }
-
-static inline void null(void *p) { (void) p; return; }
-
 /*
  * Pointer to a special location to indicate REMOVED elements
 */

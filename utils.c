@@ -2,6 +2,8 @@
 
 void *id(void *p) { return p; }
 
+void null(void *p) { (void) p; return; }
+
 unsigned KRHash(char *s) {
   unsigned hashval;
   for (hashval = 0; *s != '\0'; ++s) {

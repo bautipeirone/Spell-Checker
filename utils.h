@@ -36,6 +36,12 @@ typedef void (*VisitFunction)(void *data);
 // Funcion de representacion del dato, con argumento extra
 typedef void (*VisitFunctionExtra)(void *data, void *extra);
 
+// Retorna el mismo puntero que recibe
+void *id(void *p);
+
+// No efectua ninguna accion
+void null(void *p);
+
 /**
  * Funcion de hash para strings propuesta por Kernighan & Ritchie en "The C
  * Programming Language (Second Ed.)".
