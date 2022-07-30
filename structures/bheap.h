@@ -16,7 +16,7 @@ typedef struct _BHeap {
  * Initializes a heap with a size given and the provided compare, copy
  * and destroy function
 */
-BHeap bheap_init(unsigned size, CompareFunction cmp, CopyFunction copy,
+BHeap bheap_init(size_t size, CompareFunction cmp, CopyFunction copy,
                 DestroyFunction destroy);
 
 /*

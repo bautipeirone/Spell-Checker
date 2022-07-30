@@ -13,11 +13,11 @@ static inline unsigned lchild_pos(const unsigned pos) { return pos * 2 + 1; }
 
 static inline unsigned rchild_pos(const unsigned pos) { return (pos + 1) * 2; }
 
-BHeap bheap_init(unsigned size, CompareFunction cmp, CopyFunction copy,
+BHeap bheap_init(size_t size, CompareFunction cmp, CopyFunction copy,
   DestroyFunction destroy) {
   BHeap heap = malloc(sizeof(struct _BHeap));
   assert(heap != NULL);
-  heap->arr = malloc(sizeof(void*) * size);
+  heap->arr = malloc(size * sizeof(void*));
   assert(heap->arr != NULL);
   heap->size = size;
   heap->last = 0;
@@ -92,7 +92,7 @@ void bheap_sink_element(BHeap heap, unsigned pos) {
       max_child = lc;
     else
       max_child = heap->cmp(heap->arr[lc], heap->arr[rc]) <= 0 ? rc : lc;
-    if (heap->cmp(heap->arr[pos], heap->arr[max_child]) < 0) {
+    if (heap->cmp(element, heap->arr[max_child]) < 0) {
       heap->arr[pos] = heap->arr[max_child];
       pos = max_child;
     } else

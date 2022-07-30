@@ -12,5 +12,4 @@ structures/*.o
 .vscode
 .git
 *.dSYM
-input.txt
-output.txt
+
