@@ -31,7 +31,7 @@ int add_suggestion_wrongword(WrongWord w, char *suggestion) {
   return w->num == NUM_SUGGESTS;
 }
 
-Trie create_dictionary(const char* path, unsigned *len) {
+HashTable create_dictionary(const char* path, DTree dist_dict) {
   FILE* fp = fopen(path, "r");
   if (fp == NULL) {
     fprintf(stderr, "No se pudo abrir el diccionario \"%s\"\n", path);
@@ -40,11 +40,16 @@ Trie create_dictionary(const char* path, unsigned *len) {
 
   char buf[MAX_LEN_WORD + 1];
 
-  Trie root = trie_init();
+  HashTable table = hashtable_init(1000, (CopyFunction) copy_str,
+  (CompareFunction) strcmp, free, (HashFunction) KRHash);
   
-  while (read_word(fp, buf, len))
-    trie_insert(root, buf);
+  unsigned _len;
+
+  while (read_word(fp, buf, &_len)) {
+    hashtable_insert(table, buf);
+    dtree_insert(dist_dict, buf);
+  }
 
   fclose(fp);
-  return root;
+  return table;
 }

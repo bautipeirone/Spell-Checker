@@ -4,6 +4,8 @@
 #include "../utils.h"
 #include "../structures/trie.h"
 #include "../structures/queue.h"
+#include "../structures/hashtable.h"
+#include "../structures/dtree.h"
 
 typedef struct _WrongWord {
 	char *word;
@@ -46,7 +48,7 @@ int add_suggestion_wrongword(WrongWord w, char *suggestion);
  * estructura trie con el fin de tener busqueda eficiente y ahorrar memoria
  * aprovechando los prefijos que las palabras comparten
 */
-Trie create_dictionary(const char* path, unsigned *len);
+HashTable create_dictionary(const char* path, DTree dist_dict);
 
 
 #endif /* __DICT_H__ */

@@ -31,6 +31,9 @@ typedef void (*DestroyFunction)(void *data);
 // Retorna un entero positivo para data
 typedef unsigned (*HashFunction)(void *data);
 
+// Tipo de funcion que calcula distancia entre x e y
+typedef unsigned (*DistanceFunction)(char*, char*, unsigned, unsigned);
+
 typedef void (*VisitFunction)(void *data);
 
 // Funcion de representacion del dato, con argumento extra
@@ -41,6 +44,12 @@ void *id(void *p);
 
 // No efectua ninguna accion
 void null(void *p);
+
+int min(const int x, const int y);
+
+int min4(int x, int y, int z, int w);
+
+void lower_str(char *str);
 
 /**
  * Funcion de hash para strings propuesta por Kernighan & Ritchie en "The C

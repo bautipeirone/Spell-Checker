@@ -32,7 +32,7 @@ HashTable hashtable_init(unsigned size, CopyFunction copy,
 
   HashTable table = malloc(sizeof(struct _HashTable));
   assert(table != NULL);
-  table->elems = malloc(sizeof(void*) * size);
+  table->elems = calloc(size, sizeof(void*));
   assert(table->elems != NULL);
   table->num_elems = 0;
   table->size = size;
@@ -40,9 +40,6 @@ HashTable hashtable_init(unsigned size, CopyFunction copy,
   table->cmp = cmp;
   table->destroy = destroy;
   table->hash = hash;
-
-  for (unsigned idx = 0; idx < size; ++idx)
-    table->elems[idx] = NULL;
 
   return table;
 }
@@ -56,10 +53,6 @@ unsigned hashtable_nelems(HashTable table) { return table->num_elems; }
  * Returns the size of the table
  */
 unsigned hashtable_size(HashTable table) { return table->size; }
-
-static inline float charge_factor(HashTable table) {
-  return ((float) table->num_elems / (float) table->size);
-}
 
 /**
  * Destroys the table
@@ -82,7 +75,7 @@ void hashtable_free(HashTable table) {
 void hashtable_insert(HashTable table, void *data) {
 
   // If charge factor is greater than a certain threshold, resize the table
-  if (charge_factor(table) > CHARGE_FACTOR_THRESH)
+  if (table->num_elems * 10 > CHARGE_FACTOR_THRESH * table->size)
     hashtable_resize(table);
 
   // Calculate the index of data in the table
@@ -104,7 +97,7 @@ void hashtable_insert(HashTable table, void *data) {
     }
     idx = (idx + 1) % table->size;
   }
-  return ;
+  return;
 }
 
 void* hashtable_search(HashTable table, void *data) {
@@ -148,23 +141,19 @@ void hashtable_resize(HashTable table) {
   unsigned tmp_size = table->size;
   table->size *= 2;
   table->num_elems = 0;
-  table->elems = malloc(sizeof(void*) * table->size);
+  table->elems = calloc(table->size, sizeof(void*));
   assert(table->elems != NULL);
   
   CopyFunction copy = table->copy;
-  DestroyFunction destroy = table->destroy;
   table->copy = id;
-  table->destroy = null;
 
   for (unsigned i = 0; i < tmp_size; ++i) {
     if (tmp_elems[i] == NULL || tmp_elems[i] == REMOVED)
       continue;
     hashtable_insert(table, tmp_elems[i]);
-    table->destroy(tmp_elems[i]);
   }
 
   table->copy = copy;
-  table->destroy = destroy;
 
   free(tmp_elems);
 }

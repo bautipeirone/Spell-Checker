@@ -2,7 +2,7 @@
 #define __HASHTABLE_H__
 
 #include "../utils.h"
-#define CHARGE_FACTOR_THRESH 0.7F
+#define CHARGE_FACTOR_THRESH 7
 
 typedef struct _HashTable *HashTable;
 

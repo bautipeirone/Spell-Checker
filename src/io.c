@@ -17,7 +17,7 @@ int read_word(FILE* fp, char buf[MAX_LEN_WORD + 1], unsigned *line_number) {
     c = getc(fp);
     if (c == EOF) {
       buf[i] = '\0';
-      return 0;
+      return 1;
     } else if (isalpha(c))
       buf[i++] = c;
     else
