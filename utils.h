@@ -53,4 +53,10 @@ unsigned KRHash(char *s);
 */
 char* copy_str(const char *str);
 
+int min(const int x, const int y);
+
+int min4(const int x, const int y, const int z, const int w);
+
+void lower_str(char *str);
+
 #endif /* __UTILS_H__ */

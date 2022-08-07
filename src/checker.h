@@ -18,7 +18,7 @@
  * de hasta distancia 3. En el arreglo, las palabras se encuentran ordenadas
  * segun su distancia a la palabra original
 */
-void make_suggests(WrongWord word, Trie dictionary, unsigned size);
+void make_suggests(WrongWord word, Trie dictionary);
 
 /*
  * Algoritmo para obtener distancia de edicion de dos strings.
@@ -28,9 +28,7 @@ void make_suggests(WrongWord word, Trie dictionary, unsigned size);
  * Tiempo: O(n * m) donde len(str1) = n y len(str2) = m
  * Memoria: O(n * m) donde len(str1) = n y len(str2) = m
 */
-unsigned edit_distance(const char* str1, const char* str2);
-
-unsigned distance(char *str1, char *str2, unsigned len1, unsigned len2);
+unsigned edit_distance(char *str1, char *str2, unsigned len1, unsigned len2);
 
 /*
  * Analiza si una palabra esta en el diccionario, si no lo esta, busca en la
@@ -45,11 +43,11 @@ void check_word(const char* str, HashTable corrected_words, Trie dict);
  * como referencia el diccionario. Retorna una tabla hash con las
  * sugerencias hechas para las palabras con errores de escritura
 */
-HashTable check_file(const char* input, Trie dictionary, unsigned size);
+HashTable check_file(const char* input, Trie dictionary);
 
 /*
 
 */
-BHeap calculate_distances(Trie root, unsigned dict_size, char *str, int len);
+BHeap calculate_distances(Trie root, char *str, int len);
 
 #endif /* __CHECKER_H__ */

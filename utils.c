@@ -18,3 +18,18 @@ char* copy_str(const char *str) {
   strcpy(copy, str);
   return copy;
 }
+
+int min(const int x, const int y) {
+  if (x > y)
+    return y;
+  return x;
+}
+
+int min4(const int x, const int y, const int z, const int w) {
+  return min(min(x, y), min(z,w));
+}
+
+void lower_str(char *str) {
+  for (; *str != '\0'; str++)
+    *str = tolower(*str);
+}

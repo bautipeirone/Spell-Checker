@@ -1,0 +1,21 @@
+ - Cortar calculo de distancias al tener 5 de distancia 1.
+ - Convertir hijos de Trie a una tabla hash
+ - Implementar sugerencias con separaciones:
+   * Nivel 1:
+      - Split
+   * Nivel 2:
+      - Trasposition, split
+      - Insertion, split
+      - Deletion, split
+      - Replacemente, split
+   * Nivel 3:
+      - Insertion, Insertion, Split
+      - Trasposition, Trasposition, Split (Avoid swapping the same pair)
+      - Trasposition, Insertion, Split
+      - Deletion, Insertion, Split (Avoid inserting in the deleted spot)
+      - Trasposition, Replacement, Split
+      - Deletion, Replacement, Split
+      - Deletion, Trasposition, Split
+      - Replacement, Insertion, Split
+      - Deletion, Deletion, Split
+      - Replacement, Replacement, Split (Avoid replacing the same char)
