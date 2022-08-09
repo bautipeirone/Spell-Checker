@@ -18,10 +18,6 @@ void destroy_wd(WordDistance w) {
   free(w);
 }
 
-int min3(int x, int y, int z) {
-  return min(min(x, y), z);
-}
-/*
 unsigned edit_distance(char *str1, char *str2, unsigned len1, unsigned len2) {
   // Memoria O(m), m = len2
   // Tiempo O(n * m), n = len1, m = len2
@@ -73,7 +69,8 @@ unsigned edit_distance(char *str1, char *str2, unsigned len1, unsigned len2) {
 
   return result;
 }
-*/
+
+/*
 unsigned edit_distance(char *str1, char *str2, unsigned len1, unsigned len2) {
   unsigned *distances = malloc(sizeof(unsigned) * (len2 + 1));
   unsigned *buffer = malloc(sizeof(unsigned) * (len2 + 1));
@@ -97,3 +94,4 @@ unsigned edit_distance(char *str1, char *str2, unsigned len1, unsigned len2) {
 
   return result;
 }
+*/

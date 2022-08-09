@@ -72,7 +72,7 @@ int __calculate_distances(Trie root, BHeap heap, int depth,
     buf[depth + 1] = '\0';
     bheap_insert(heap, init_wd(buf, distance));
     if (distance == 1)
-      if (++(*dist1) == MAX_SEARCH_DISTANCE)
+      if (++(*dist1) == NUM_SUGGESTS)
         return 1;
   }
 
