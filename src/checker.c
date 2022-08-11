@@ -64,7 +64,7 @@ HashTable check_file(const char* input, Trie dictionary) {
   return incorrect_words;
 }
 
-int __calculate_distances(Trie root, BHeap heap, int depth,
+void __calculate_distances(Trie root, BHeap heap, int depth,
               char buf[MAX_LEN_WORD + 1], char *str, int len, unsigned *dist1) {
   buf[depth] = root->c;
   if (root->end_of_word && (len - depth) <= MAX_SEARCH_DISTANCE) {
@@ -73,21 +73,21 @@ int __calculate_distances(Trie root, BHeap heap, int depth,
     bheap_insert(heap, init_wd(buf, distance));
     if (distance == 1)
       if (++(*dist1) == NUM_SUGGESTS)
-        return 1;
-  }
+        return ;
+    }
 
   if (depth - len > MAX_SEARCH_DISTANCE)
-    return 0;
+    return ;
 
-  int stop = 0;
   for (int i = 0; i < NCHARS; ++i) {
-    if (root->children[i] != NULL)
-      stop = __calculate_distances(root->children[i], 
+    if (root->children[i] != NULL) {
+      __calculate_distances(root->children[i], 
                         heap, depth + 1, buf, str, len, dist1);
-    if (stop)
-      return 1;
+    if (*dist1 == NUM_SUGGESTS)
+      return ;
+    }
   }
-  return 0;
+  return ;
 }
 
 BHeap calculate_distances(Trie root, char *str, int len) {
@@ -96,7 +96,7 @@ BHeap calculate_distances(Trie root, char *str, int len) {
   BHeap heap = bheap_init(100, (CompareFunction) compare_wd, id,
                           (DestroyFunction) destroy_wd);
   // Check suggestions have the right priority in the heap
-  for (int i = 0; i < NCHARS; ++i)
+  for (int i = 0; i < NCHARS && dist1 < NUM_SUGGESTS; ++i)
     if (root->children[i])
       __calculate_distances(root->children[i], heap, 0, buf, str, len, &dist1);
   return heap;

@@ -53,11 +53,13 @@ unsigned KRHash(char *s);
 */
 char* copy_str(const char *str);
 
+/*
 int min(const int x, const int y);
 
 int min3(int x, int y, int z);
 
 int min4(const int x, const int y, const int z, const int w);
+*/
 
 void lower_str(char *str);
 

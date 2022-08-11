@@ -1,5 +1,21 @@
 #include "distances.h"
 
+
+static inline int min(const int x, const int y) {
+  if (x > y)
+    return y;
+  return x;
+}
+
+__attribute__((unused))
+static inline int min3(int x, int y, int z) {
+  return min(min(x, y), z);
+}
+
+static inline int min4(const int x, const int y, const int z, const int w) {
+  return min(min(x, y), min(z,w));
+}
+
 WordDistance init_wd(char *str, unsigned dist) {
   WordDistance w = malloc(sizeof(struct _WordDistance));
   assert(w != NULL);

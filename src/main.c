@@ -5,7 +5,7 @@
 int main(int argc, const char* argv[]) {
   if (argc != 3)
     usage(); 
-  (void) argv;
+  
   unsigned dict_size = 0;
   const char* dictionary_path = "diccionario.txt";
 
