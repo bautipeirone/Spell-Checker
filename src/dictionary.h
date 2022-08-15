@@ -3,13 +3,13 @@
 
 #include "../utils.h"
 #include "../structures/trie.h"
-#include "../structures/queue.h"
+#include "../structures/gqueue.h"
 
 typedef struct _WrongWord {
 	char *word;
 	char *suggests[NUM_SUGGESTS];
 	int num;
-  Queue lines;
+  GQueue lines;
 } *WrongWord;
 
 /*

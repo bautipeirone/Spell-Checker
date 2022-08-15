@@ -1,23 +1,14 @@
 #include "gqueue.h"
 
 GQueue gqueue_init() {
-    GQueue q = malloc(sizeof(struct _GQueue));
-    assert(q != NULL);
-    q->last = q->first = NULL;
-    return q;
+  return glist_init();
 }
 
 void gqueue_free(GQueue q, DestroyFunction destroy) {
-    while (!gqueue_empty(q)) {
-        GNode *tmp = q->first;
-        q->first = q->first->next;
-        destroy(tmp->data);
-        free(tmp);
-    }
-    free(q);
+  glist_free(q, destroy);
 }
 
-int gqueue_empty(GQueue q) { return q->first == NULL; }
+int gqueue_empty(GQueue q) { return glist_empty(q); }
 
 void* gqueue_start(GQueue q, CopyFunction copy) {
 	if (gqueue_empty(q))
@@ -26,27 +17,9 @@ void* gqueue_start(GQueue q, CopyFunction copy) {
 }
 
 void gqueue_push(GQueue q, void *data, CopyFunction copy) {
-  GNode *new_node = malloc(sizeof(GNode));
-  assert(new_node != NULL);
-  new_node->data = copy(data);
-  new_node->next = NULL;
-  
-  if (gqueue_empty(q))
-		q->first = new_node;
-	else
-		q->last->next = new_node;
-  q->last = new_node;
+  glist_add_last(q, data, copy);
 }
 
 void gqueue_pop(GQueue q, DestroyFunction destroy) {
-  if (gqueue_empty(q)) return ;
-  GNode *node_to_remove = q->first;
-    
-  q->first = q->first->next;
-  if (q->first == NULL)
-    q->last = NULL;
-    
-  destroy(node_to_remove->data);
-  free(node_to_remove);
+  glist_remove_start(q, destroy);
 }
-

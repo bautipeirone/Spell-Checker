@@ -22,15 +22,12 @@ void trie_insert(Trie root, const char* str) {
   assert(!trie_empty(root));
   Trie tmp;
   for (tmp = root; *str != '\0'; str++) {
-    if (!('a' <= *str && *str <= 'z')) {
-      putchar(*str);
-      return;
+    char c = tolower(*str); // Se insertan solo palabras en minusculas
+    if (tmp->children[c - 'a'] == NULL) {
+      tmp->children[c - 'a'] = trie_init();
+      tmp->children[c - 'a']->c = c;
     }
-    if (tmp->children[*str - 'a'] == NULL) {
-      tmp->children[*str - 'a'] = trie_init();
-      tmp->children[*str - 'a']->c = *str;
-    }
-    tmp = tmp->children[*str - 'a'];
+    tmp = tmp->children[c - 'a'];
   }
   tmp->end_of_word = 1;
 }
@@ -40,6 +37,7 @@ int trie_search(Trie root, const char* str) {
     return 0;
   Trie tmp;
   for (tmp = root; *str != '\0'; str++) {
+    assert('a' <= *str && *str <= 'z');
     // La cadena no se encuentra en el trie
     if (tmp->children[*str - 'a'] == NULL)
       return 0;

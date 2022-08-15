@@ -19,6 +19,13 @@ char* copy_str(const char *str) {
   return copy;
 }
 
+int* copy_int(int *p) {
+  int* copy = malloc(sizeof(int));
+  assert(copy != NULL);
+  *copy = *p;
+  return copy;
+}
+
 void lower_str(char *str) {
   for (; *str != '\0'; str++)
     *str = tolower(*str);

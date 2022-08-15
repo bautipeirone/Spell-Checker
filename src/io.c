@@ -33,9 +33,9 @@ int read_word(FILE* fp, char buf[MAX_LEN_WORD + 1], unsigned *line_number) {
 
 void write_correction(WrongWord w, FILE *fp) {
   fputs("Lineas ", fp);
-  while (!queue_empty(w->lines)) {
-    fprintf(fp, "%d, ", queue_start(w->lines));
-    queue_pop(w->lines);
+  while (!gqueue_empty(w->lines)) {
+    fprintf(fp, "%d, ", *((int*) gqueue_start(w->lines, id)));
+    gqueue_pop(w->lines, free);
   }
   fprintf(fp, "\"%s\" no esta en el diccionario\n", w->word);
   if (w->num == 0)

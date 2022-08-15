@@ -1,4 +1,3 @@
-
 /*
 void insert(char *word, unsigned const len, GQueue q) {
   char *buf = malloc(len + 2);
@@ -79,4 +78,14 @@ GQueue distance1(char *word) {
   split(word, len, q);
   return q;
 }
+
+
+GList brute_force(Trie dictionary, char* word, GList list,
+                  Trie repeated_words) {
+  if (max_distance == MAX_)
+    return NULL;
+  else if (max_distance == 1)
+    return distance1(word);
+}
+
 */

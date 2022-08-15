@@ -4,7 +4,7 @@
 WrongWord init_wrongword(const char *str) {
   WrongWord w = malloc(sizeof(struct _WrongWord));
   assert(w != NULL);
-  w->lines = queue_init();
+  w->lines = gqueue_init();
   w->num = 0;
   w->word = copy_str(str);
   return w;
@@ -15,7 +15,7 @@ int cmp_wrongword(WrongWord w1, WrongWord w2) {
 }
 
 void free_wrongword(WrongWord w) {
-  queue_free(w->lines);
+  gqueue_free(w->lines, free);
   for (int i = 0; i < w->num; ++i)
     free(w->suggests[i]);
   free(w->word);

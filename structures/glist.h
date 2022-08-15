@@ -6,55 +6,53 @@
 #include <stdlib.h>
 
 typedef struct _GNode {
-    void *data;
-    struct _GNode *next;
-} GNode;
+  void *data;
+  struct _GNode *next;
+} *GNode;
 
-typedef GNode *GList;
+typedef struct _GList {
+  GNode first, last;
+} *GList;
 
 /*
-** Returns an empty list
+** Retorna una lista vacia
 */
 GList glist_init();
 
 /*
-** Destroys the list
+** Destruye la lista
 */
 void glist_free(GList list, DestroyFunction destroy);
 
+/*
+** Retorna la longitud de la lista
+*/
 unsigned glist_len(GList list);
 
 /*
-** Returns 1 if the list is empty, 0 otherwise
+** Retorna 1 si la lista es vacia, 0 en caso contrario
 */
 int glist_empty(GList list);
 
 /*
-** Adds an element to the start of the list
+** Añade un elemento al comienzo de la lista
 */
-GList glist_append_start(GList list, void *data, CopyFunction copy);
+void glist_add_start(GList list, void *data, CopyFunction copy);
 
 /*
-** Removes the first element of the list if its not empty, and returns the
-** new first node
+** Añade un nodo al final de la lista
 */
-GList glist_remove_start(GList list, DestroyFunction destroy);
+void glist_add_last(GList list, void *data, CopyFunction copy);
 
 /*
-** Visits all nodes on the list, applying the function to the
-** data of each one
+** Remueve el primer elemento de la lista si esta no es vacia
+*/
+void glist_remove_start(GList list, DestroyFunction destroy);
+
+/*
+** Visita todos los nodos de la lista, aplicando la funcion en el
+** dato de cada nodo
 */
 void glist_visit(GList list, void (*f)(void *data));
-
-/*
-** Filters the list with the predicate passed as argument
-*/
-// GList glist_filter(GList list, CopyFunction c, Predicate p);
-
-/*
-** Returns the data from a node that matches with data passed as argument,
-** returns NULL if no node matches.
-*/
-void* glist_search(GList list, void* data, CompareFunction cmp);
 
 #endif /* __GLIST_H__ */

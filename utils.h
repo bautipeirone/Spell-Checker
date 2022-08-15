@@ -54,6 +54,11 @@ unsigned KRHash(char *s);
 char* copy_str(const char *str);
 
 /*
+ * Retorna una copia del int
+*/
+int* copy_int(int *p);
+
+/*
 int min(const int x, const int y);
 
 int min3(int x, int y, int z);

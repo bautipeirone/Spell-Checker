@@ -48,6 +48,6 @@ HashTable check_file(const char* input, Trie dictionary);
 /*
 
 */
-BHeap calculate_distances(Trie root, char *str, int len);
+BHeap calculate_distances(Trie root, char *str);
 
 #endif /* __CHECKER_H__ */
