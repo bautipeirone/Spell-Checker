@@ -31,3 +31,6 @@ input.txt: 1.51s user 0.15s system 66% cpu 2.503 total
 lorem.txt: over 4min
 
 Brute Force Implementation (Second Method - Sooner stop)
+z.txt: 4.70s user 0.40s system 86% cpu 5.886 total
+input.txt: 1.28s user 0.15s system 97% cpu 1.474 total
+

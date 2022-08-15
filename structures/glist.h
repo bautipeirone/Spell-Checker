@@ -14,6 +14,20 @@ typedef struct _GList {
   GNode first, last;
 } *GList;
 
+GNode gnode_add_start(GNode, void*, CopyFunction);
+
+GNode gnode_remove_start(GNode head, DestroyFunction destroy);
+
+void* gnode_search(GNode, void*, CompareFunction);
+
+/*
+** Visita todos los nodos de la lista, aplicando la funcion en el
+** dato de cada nodo
+*/
+void gnode_visit(VisitFunctionExtra visit, GNode head, void* extra);
+
+void gnode_free(GNode head, DestroyFunction destroy);
+
 /*
 ** Retorna una lista vacia
 */
@@ -48,11 +62,5 @@ void glist_add_last(GList list, void *data, CopyFunction copy);
 ** Remueve el primer elemento de la lista si esta no es vacia
 */
 void glist_remove_start(GList list, DestroyFunction destroy);
-
-/*
-** Visita todos los nodos de la lista, aplicando la funcion en el
-** dato de cada nodo
-*/
-void glist_visit(GList list, void (*f)(void *data));
 
 #endif /* __GLIST_H__ */

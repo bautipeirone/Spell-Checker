@@ -8,7 +8,6 @@
 #include "../structures/bheap.h"
 #include "dictionary.h"
 
-
 /*
  * Dada una palabra que no se encuentra en el diccionario, busca sugerencias
  * en base a las 5 reglas propuestas: insercion, reemplazo, eliminacion,
@@ -29,14 +28,6 @@ void make_suggests(WrongWord word, Trie dictionary);
  * Memoria: O(n * m) donde len(str1) = n y len(str2) = m
 */
 unsigned edit_distance(char *str1, char *str2, unsigned len1, unsigned len2);
-
-/*
- * Analiza si una palabra esta en el diccionario, si no lo esta, busca en la
- * tabla para ver si la palabra ya fue previamente corregida, y sino busca
- * 5 sugerencias (en lo posible) agregandolas a la tabla
-*/
-void check_word(const char* str, HashTable corrected_words, Trie dict);
-
 
 /*
  * Chequea palabra por palabra del archivo path si esta es valida tomando

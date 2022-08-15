@@ -32,7 +32,7 @@ int insert(WrongWord wword, const char* word, unsigned const len, GList list, Tr
         stop = add_suggestion_wrongword(wword, buf);
       if (stop)
         break;
-      else
+      else if (list != NULL)
         glist_add_last(list, buf, (CopyFunction) copy_str);
     }
     buf[i] = buf[i + 1];
@@ -57,7 +57,7 @@ int replace(WrongWord wword, const char* word, unsigned const len, GList list, T
         stop = add_suggestion_wrongword(wword, buf);
       if (stop)
         break;
-      else
+      else if (list != NULL)
         glist_add_last(list, buf, (CopyFunction) copy_str);
     }
     buf[i] = c;
@@ -81,7 +81,7 @@ int swap(WrongWord wword, const char* word, unsigned const len, GList list, Trie
         stop = add_suggestion_wrongword(wword, buf);
       if (stop)
         break;
-      else
+      else if (list != NULL)
         glist_add_last(list, buf, (CopyFunction) copy_str);
       buf[i] = word[i];
     }
@@ -100,7 +100,7 @@ int delete(WrongWord wword, const char* word, unsigned const len, GList list, Tr
   
   if (trie_search(dictionary, buf))
     stop = add_suggestion_wrongword(wword, buf);
-  if (!stop)
+  if (!stop && list != NULL)
     glist_add_last(list, buf, (CopyFunction) copy_str);
   
   for (unsigned i = 0; i < len - 1 && !stop; ++i) {
@@ -109,7 +109,7 @@ int delete(WrongWord wword, const char* word, unsigned const len, GList list, Tr
       stop = add_suggestion_wrongword(wword, buf);
     if (stop)
       break;
-    else
+    else if (list != NULL)
       glist_add_last(list, buf, (CopyFunction) copy_str);
   }
   free(buf);
@@ -130,7 +130,7 @@ int split(WrongWord wword, const char* word, unsigned const len, GList list, Tri
       stop = add_suggestion_wrongword(wword, buf);
     if (stop)
       break;
-    else
+    else if (list != NULL)
       glist_add_last(list, buf, (CopyFunction) copy_str);
   }
   free(buf);
@@ -163,8 +163,8 @@ void make_suggests(WrongWord wword, Trie dictionary) {
   for (int d = 1; !stop && d <= MAX_SEARCH_DISTANCE; ++d) {
     sbd[d - 1] = glist_init();
     if (d == 1) {
-    // Si la distancia es 1, entonces la lista es vacia ya que no hay
-    // distancias anteriores
+      // Si la distancia es 1, entonces la lista es vacia ya que no hay
+      // distancias anteriores
       stop = get_distance_1(wword, wword->word, sbd[0], dictionary);
       hashtable_insert(tried, wword->word);
     } else {
@@ -175,9 +175,15 @@ void make_suggests(WrongWord wword, Trie dictionary) {
         if (strchr(top, ' ') != NULL)
           continue;
         if (hashtable_search(tried, top) == NULL) {
-          if ((stop = get_distance_1(wword, top, sbd[d - 1], dictionary)))
-            break;
-          hashtable_insert(tried, top);
+          if (d == MAX_SEARCH_DISTANCE) {
+            stop = get_distance_1(wword, top, NULL, dictionary);
+            if (stop)
+              break;
+          } else {
+            if ((stop = get_distance_1(wword, top, sbd[d - 1], dictionary)))
+              break;
+            hashtable_insert(tried, top);
+          }
         }
       }
     }

@@ -1,7 +1,7 @@
 #include "glist.h"
 #include <stdio.h>
 
-static void gnode_free(GNode node, DestroyFunction destroy) {
+void gnode_free(GNode node, DestroyFunction destroy) {
   GNode node_to_delete;
   while (node != NULL) {
     node_to_delete = node;
@@ -9,6 +9,42 @@ static void gnode_free(GNode node, DestroyFunction destroy) {
     destroy(node_to_delete->data);
     free(node_to_delete);
   }
+}
+
+GNode gnode_add_start(GNode head, void *data, CopyFunction copy) {
+  GNode new_node = malloc(sizeof(struct _GNode));
+  assert(new_node != NULL);
+  new_node->next = head;
+  new_node->data = copy(data);
+
+  return new_node;
+}
+
+GNode gnode_remove_start(GNode head, DestroyFunction destroy) {
+  if (head == NULL)
+    return NULL;
+  
+  GNode tmp = head;
+  head = tmp->next;
+
+  destroy(tmp->data);
+  free(tmp);
+
+  return head;
+}
+
+void* gnode_search(GNode head, void* data, CompareFunction cmp) {
+    for (GNode node = head; node != NULL; node = node->next)
+        if (cmp(data, node->data) == 0)
+            return node->data;
+    return NULL;
+}
+
+void gnode_visit(VisitFunctionExtra f, GNode head, void* extra) {
+  if (head == NULL)
+    return ;
+  for (GNode node = head; node != NULL; node = node->next)
+    f(node->data, extra);
 }
 
 GList glist_init() {
@@ -39,22 +75,14 @@ unsigned glist_len(GList list) {
 
 void glist_add_start(GList list, void *data, CopyFunction copy) {
   assert(list != NULL);
-  GNode new_node = malloc(sizeof(struct _GNode));
-  assert(new_node != NULL);
-  new_node->next = list->first;
-  new_node->data = copy(data);
-
+  list->first = gnode_add_start(list->first, data, copy);
   if (list->last == NULL)
-    list->last = new_node;
-  list->first = new_node;
+    list->last = list->first;
 }
 
 void glist_add_last(GList list, void *data, CopyFunction copy) {
   assert(list != NULL);
-  GNode new_node = malloc(sizeof(struct _GNode));
-  assert(new_node != NULL);
-  new_node->data = copy(data);
-  new_node->next = NULL;
+  GNode new_node = gnode_add_start(NULL, data, copy);
   
   if (list->first == NULL)
 		list->first = new_node;
@@ -66,19 +94,9 @@ void glist_add_last(GList list, void *data, CopyFunction copy) {
 void glist_remove_start(GList list, DestroyFunction destroy) {
   if (glist_empty(list))
     return ;
-  GNode tmp = list->first;
-  list->first = tmp->next;
+
+  list->first = gnode_remove_start(list->first, destroy);
 
   if (list->first == NULL)
     list->last = NULL;
-
-  destroy(tmp->data);
-  free(tmp);
-}
-
-void glist_visit(GList list, void (*f)(void *data)) {
-  if (glist_empty(list))
-    return ;
-  for (GNode node = list->first; node != NULL; node = node->next)
-    f(node->data);
 }
