@@ -3,136 +3,6 @@
 #include "distances.h"
 #include "../structures/hashtable.h"
 
-void insert(char *word, unsigned const len, GList list) {
-  if (len < 1)
-    return;
-  char *buf = malloc(len + 2);
-  assert(buf != NULL);
-  strcpy(buf + 1, word);
-  for (unsigned i = 0; i < len + 1; ++i) {
-    for (char c = 'a'; c <= 'z'; ++c) {
-      buf[i] = c;
-      glist_add_last(list, buf, (CopyFunction) copy_str);
-    }
-    buf[i] = buf[i + 1];
-  }
-  free(buf);
-}
-
-void replace(char *word, unsigned const len, GList list) {
-  if (len < 1)
-    return;
-  char *buf = malloc(len + 1);
-  assert(buf != NULL);
-  char c;
-  strcpy(buf, word);
-  for (unsigned i = 0; i < len; ++i) {
-    c = word[i];
-    for (char x = 'a'; x < 'z'; ++x) {
-      buf[i] = x < c ? x : x + 1;
-      glist_add_last(list, buf, (CopyFunction) copy_str);
-    }
-    buf[i] = c;
-  }
-  free(buf);
-}
-
-void swap(char *word, unsigned const len, GList list) {
-  if (len <= 1)
-    return;
-  char *buf = malloc(len + 1);
-  assert(buf != NULL);
-  strcpy(buf, word);
-  for (unsigned i = 0; i < len - 1; ++i) {
-    if (word[i] != word[i + 1]) {
-      buf[i] = word[i + 1];
-      buf[i + 1] = word[i];
-      glist_add_last(list, buf, (CopyFunction) copy_str);
-      buf[i] = word[i];
-    }
-  }
-  free(buf);
-}
-
-void delete(char *word, unsigned const len, GList list) {
-  if (len <= 1)
-    return;
-  char *buf = malloc(len);
-  assert(buf != NULL);
-  strcpy(buf, word + 1);
-  glist_add_last(list, buf, (CopyFunction) copy_str);
-  for (unsigned i = 0; i < len - 1; ++i) {
-    buf[i] = word[i];
-    glist_add_last(list, buf, (CopyFunction) copy_str);
-  }
-  free(buf);
-}
-
-void split(char *word, unsigned const len, GList list) {
-  if (len <= 1)
-    return;
-  char *buf = malloc(len + 2);
-  assert(buf != NULL);
-  strcpy(buf + 1, word);
-  for (unsigned i = 0; i < len - 1; ++i) {
-    buf[i] = buf[i + 1];
-    buf[i + 1] = ' ';
-    glist_add_last(list, buf, (CopyFunction) copy_str);
-  }
-  free(buf);
-}
-
-void distance1(char *word, GList list, int calculate_split) {
-  unsigned len = strlen(word);
-  insert(word, len, list);
-  replace(word, len, list);
-  swap(word, len, list);
-  delete(word, len, list);
-  if (calculate_split)
-    split(word, len, list);
-}
-
-/*
-void make_suggests(WrongWord word, Trie dictionary) {
-  GQueue list = distance1(word->word);
-  while (word->num < NUM_SUGGESTS && !gqueue_empty(list)) {
-    char *tmp = gqueue_start(list, id);
-    if (trie_search(dictionary, tmp)) {
-      word->suggests[word->num++] = tmp;
-      gqueue_pop(list, null);
-    } else
-      gqueue_pop(list, free);
-  }
-  gqueue_free(list, free);
-}
-*/
-
-/*
-void make_suggests_distances(WrongWord wword, Trie dictionary) {
-  unsigned last_dist = 1;
-  BHeap distances_word = 
-    calculate_distances(dictionary, wword->word);
-  add_split_suggests(wword, distances_word, dictionary);
-
-  while (wword->num < NUM_SUGGESTS) {
-    WordDistance suggest = bheap_remove_max(distances_word);
-    if (suggest == NULL)
-      break;
-    if (suggest->distance <= MAX_SEARCH_DISTANCE)
-      add_suggestion_wrongword(wword, suggest->word);
-    destroy_wd(suggest);
-  }
-  bheap_destroy(distances_word);
-}
-
-void make_suggests(WrongWord wword, Trie dictionary) {
-  if (strlen(wword->word) > 12)
-    make_suggests_distances(wword, dictionary);
-  else
-    make_suggests_bf(wword, dictionary);
-}
-*/
-
 int valid_suggestion(char* word, Trie dictionary) {
   int result;
   char* copy = copy_str(word); // TODO: remove copy
@@ -148,48 +18,168 @@ int valid_suggestion(char* word, Trie dictionary) {
   return result;
 }
 
-GList __brute_force(char* word, unsigned distance, GList list, HashTable __attribute__((unused)) tried, int calculate_split) {
-  GList list2 = glist_init();
-  if (distance == 1) {
-    // Si la distancia es 1, entonces la lista es vacia ya que no hay
-    // distancias anteriores
-    distance1(word, list2, calculate_split);
-  } else {
-    assert(list != NULL);
-    // TODO: Quitar doble y triple separaciones
-    for (GNode node = list->first; node != NULL; node = node->next) {
-      char* top = node->data;
-      if (strchr(top, ' ') != NULL)
-        continue;
-      if (hashtable_search(tried, top) == NULL) {
-        distance1(top, list2, calculate_split);
-        hashtable_insert(tried, top);
-      }
+int insert(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary) {
+  if (len < 1)
+    return 0;
+  int stop = 0;
+  char *buf = malloc(len + 2);
+  assert(buf != NULL);
+  strcpy(buf + 1, word);
+  for (unsigned i = 0; i < len + 1 && !stop; ++i) {
+    for (char c = 'a'; c <= 'z'; ++c) {
+      buf[i] = c;
+      if (trie_search(dictionary, buf))
+        stop = add_suggestion_wrongword(wword, buf);
+      if (stop)
+        break;
+      else
+        glist_add_last(list, buf, (CopyFunction) copy_str);
     }
+    buf[i] = buf[i + 1];
   }
-  return list2;
+  free(buf);
+  return stop;
 }
 
-GList brute_force(char* word, unsigned distance, GList previous_distances, HashTable tried) {
-  assert(distance > 0);
-  return __brute_force(word, distance, previous_distances, tried, 1);
+int replace(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary) {
+  if (len < 1)
+    return 0;
+  char *buf = malloc(len + 1);
+  assert(buf != NULL);
+  char c;
+  int stop = 0;
+  strcpy(buf, word);
+  for (unsigned i = 0; i < len && !stop; ++i) {
+    c = word[i];
+    for (char x = 'a'; x < 'z'; ++x) {
+      buf[i] = x < c ? x : x + 1;
+      if (trie_search(dictionary, buf))
+        stop = add_suggestion_wrongword(wword, buf);
+      if (stop)
+        break;
+      else
+        glist_add_last(list, buf, (CopyFunction) copy_str);
+    }
+    buf[i] = c;
+  }
+  free(buf);
+  return stop;
+}
+
+int swap(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary) {
+  if (len <= 1)
+    return 0;
+  int stop = 0;
+  char *buf = malloc(len + 1);
+  assert(buf != NULL);
+  strcpy(buf, word);
+  for (unsigned i = 0; i < len - 1 && !stop; ++i) {
+    if (word[i] != word[i + 1]) {
+      buf[i] = word[i + 1];
+      buf[i + 1] = word[i];
+      if (trie_search(dictionary, buf))
+        stop = add_suggestion_wrongword(wword, buf);
+      if (stop)
+        break;
+      else
+        glist_add_last(list, buf, (CopyFunction) copy_str);
+      buf[i] = word[i];
+    }
+  }
+  free(buf);
+  return stop;
+}
+
+int delete(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary) {
+  if (len <= 1)
+    return 0;
+  int stop = 0;
+  char *buf = malloc(len);
+  assert(buf != NULL);
+  strcpy(buf, word + 1);
+  
+  if (trie_search(dictionary, buf))
+    stop = add_suggestion_wrongword(wword, buf);
+  if (!stop)
+    glist_add_last(list, buf, (CopyFunction) copy_str);
+  
+  for (unsigned i = 0; i < len - 1 && !stop; ++i) {
+    buf[i] = word[i];
+    if (trie_search(dictionary, buf))
+      stop = add_suggestion_wrongword(wword, buf);
+    if (stop)
+      break;
+    else
+      glist_add_last(list, buf, (CopyFunction) copy_str);
+  }
+  free(buf);
+  return stop;
+}
+
+int split(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary) {
+  if (len <= 1)
+    return 0;
+  int stop = 0;
+  char *buf = malloc(len + 2);
+  assert(buf != NULL);
+  strcpy(buf + 1, word);
+  for (unsigned i = 0; i < len - 1; ++i) {
+    buf[i] = buf[i + 1];
+    buf[i + 1] = ' ';
+    if (valid_suggestion(buf, dictionary))
+      stop = add_suggestion_wrongword(wword, buf);
+    if (stop)
+      break;
+    else
+      glist_add_last(list, buf, (CopyFunction) copy_str);
+  }
+  free(buf);
+  return stop;
+}
+
+int get_distance_1(WrongWord wword, const char* word, GList list, Trie dictionary) {
+  unsigned len = strlen(word);
+  if (insert(wword, word, len, list, dictionary))
+    return 1;
+  if (replace(wword, word, len, list, dictionary))
+    return 1;
+  if (swap(wword, word, len, list, dictionary))
+    return 1;
+  if (delete(wword, word, len, list, dictionary))
+    return 1;
+  if (split(wword, word, len, list, dictionary))
+    return 1;
+  return 0;
 }
 
 void make_suggests(WrongWord wword, Trie dictionary) {
-  char* suggestion;
   int stop = 0;
   HashTable tried = hashtable_init(1000UL, (CopyFunction) copy_str,
                 (CompareFunction) strcmp, free, (HashFunction) KRHash);
   GList sbd[MAX_SEARCH_DISTANCE - 1]; // Suggestions by distance
-  // TODO: Initialize before loop and passed them as buffer
+
   for (int i = 0; i < MAX_SEARCH_DISTANCE - 1; sbd[i++] = NULL); 
 
-  for (int i = 1; !stop && i <= MAX_SEARCH_DISTANCE; ++i) {
-    sbd[i - 1] = brute_force(wword->word, i, (i > 1 ? sbd[i - 2] : NULL), tried);
-    for (GNode node = sbd[i - 1]->first; !stop && node != NULL; node = node->next) {
-      suggestion = (char*) node->data;
-      if (valid_suggestion(suggestion, dictionary))
-        stop = add_suggestion_wrongword(wword, suggestion);
+  for (int d = 1; !stop && d <= MAX_SEARCH_DISTANCE; ++d) {
+    sbd[d - 1] = glist_init();
+    if (d == 1) {
+    // Si la distancia es 1, entonces la lista es vacia ya que no hay
+    // distancias anteriores
+      stop = get_distance_1(wword, wword->word, sbd[0], dictionary);
+      hashtable_insert(tried, wword->word);
+    } else {
+      assert(sbd[d - 1] != NULL);
+      // TODO: Quitar doble y triple separaciones
+      for (GNode node = sbd[d - 2]->first; node != NULL; node = node->next) {
+        char* top = node->data;
+        if (strchr(top, ' ') != NULL)
+          continue;
+        if (hashtable_search(tried, top) == NULL) {
+          if ((stop = get_distance_1(wword, top, sbd[d - 1], dictionary)))
+            break;
+          hashtable_insert(tried, top);
+        }
+      }
     }
   }
   for (int i = 0; i < MAX_SEARCH_DISTANCE - 1; glist_free(sbd[i++], free));
@@ -231,7 +221,10 @@ HashTable check_file(const char* input, Trie dictionary) {
   return incorrect_words;
 }
 
-void __calculate_distances(Trie root, BHeap heap, int depth,
+
+// Calculo de distancias
+
+/*(Trie root, BHeap heap, int depth,
               char buf[MAX_LEN_WORD + 1], char *str, int len, unsigned *dist1) {
   buf[depth] = root->c;
   if (root->end_of_word && (len - depth) <= MAX_SEARCH_DISTANCE) {
@@ -247,24 +240,21 @@ void __calculate_distances(Trie root, BHeap heap, int depth,
     return ;
 
   for (int i = 0; i < NCHARS; ++i) {
-    if (root->children[i] != NULL) {
-      __calculate_distances(root->children[i], 
+    if (root->children[i] != NULL) (root->children[i], 
                         heap, depth + 1, buf, str, len, dist1);
     if (*dist1 == NUM_SUGGESTS)
       return ;
     }
   }
   return ;
-}
-
-BHeap calculate_distances(Trie root, char *str) {
+}(Trie root, char *str) {
   unsigned dist1 = 0; // Keeps track of distance 1 words found
   char buf[MAX_LEN_WORD + 1];
   BHeap heap = bheap_init(100, (CompareFunction) compare_wd, id,
                           (DestroyFunction) destroy_wd);
   // Check suggestions have the right priority in the heap
   for (int i = 0; i < NCHARS && dist1 < NUM_SUGGESTS; ++i)
-    if (root->children[i])
-      __calculate_distances(root->children[i], heap, 0, buf, str, strlen(str), &dist1);
+    if (root->children[i](root->children[i], heap, 0, buf, str, strlen(str), &dist1);
   return heap;
 }
+*/
