@@ -177,13 +177,12 @@ void make_suggests(WrongWord wword, Trie dictionary) {
         if (hashtable_search(tried, top) == NULL) {
           if (d == MAX_SEARCH_DISTANCE) {
             stop = get_distance_1(wword, top, NULL, dictionary);
-            if (stop)
-              break;
           } else {
-            if ((stop = get_distance_1(wword, top, sbd[d - 1], dictionary)))
-              break;
+            stop = get_distance_1(wword, top, sbd[d - 1], dictionary);
             hashtable_insert(tried, top);
           }
+          if (stop)
+            break;
         }
       }
     }

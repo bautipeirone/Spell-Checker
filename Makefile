@@ -7,6 +7,7 @@ BIN = main
 
 # Archivos fuente
 SOURCE = $(wildcard src/*.c)
+SOURCE := $(filter-out src/main.c, $(SOURCE))
 SOURCE_O = $(SOURCE:c=o)
 
 STRUCTURES = $(wildcard structures/*.c)
@@ -15,12 +16,16 @@ STRUCTURES_O = $(STRUCTURES:c=o)
 TESTS = tests/main.c
 
 # Compilar el programa
-all: $(SOURCE_O) $(STRUCTURES_O)
+all: src/main.o $(SOURCE_O) $(STRUCTURES_O)
 	$(CC) $(CFLAGS) $^ utils.c -o $(BIN)
 
 # Crear .o desde archivos .c
 %.o: %.c
 	$(CC) -c $(CFLAGS) $^ -o $@
+
+# Compilar tests
+tests: tests/main.o $(SOURCE_O) $(STRUCTURES_O)
+	$(CC) $(CFLAGS) $^ utils.c -o test
 
 # Compilar para depuracion
 .PHONY: debug
@@ -30,6 +35,6 @@ debug:
 # Remover archivos .o, ejecutables, etc
 .PHONY: clean
 clean:
-	@-rm -r *.dSYM 2>/dev/null || true
-	@-rm src/*.o structures/*.o 2>/dev/null || true
-	@-rm $(BIN) 2>/dev/null || true 
+	@rm -r *.dSYM 2>/dev/null || true
+	@rm src/*.o structures/*.o 2>/dev/null || true
+	@rm $(BIN) 2>/dev/null || true
