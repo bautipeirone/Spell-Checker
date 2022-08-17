@@ -5,41 +5,29 @@
 
 void make_suggests(WrongWord wword, Trie dictionary) {
   int stop = 0;
-  HashTable tried = hashtable_init(1000UL, (CopyFunction) copy_str,
-                (CompareFunction) strcmp, free, (HashFunction) KRHash);
-  GList sbd[MAX_SEARCH_DISTANCE - 1]; // Suggestions by distance
-
-  for (int i = 0; i < MAX_SEARCH_DISTANCE - 1; sbd[i++] = NULL); 
-
-  for (int d = 1; !stop && d <= MAX_SEARCH_DISTANCE; ++d) {
-    sbd[d - 1] = glist_init();
-    if (d == 1) {
-      // Si la distancia es 1, entonces la lista es vacia ya que no hay
-      // distancias anteriores
-      stop = get_distance_1(wword, wword->word, sbd[0], dictionary);
-      hashtable_insert(tried, wword->word);
-    } else {
-      assert(sbd[d - 1] != NULL);
-      // TODO: Quitar doble y triple separaciones
-      for (GNode node = sbd[d - 2]->first; node != NULL; node = node->next) {
-        char* top = node->data;
-        if (strchr(top, ' ') != NULL)
-          continue;
-        if (hashtable_search(tried, top) == NULL) {
-          if (d == MAX_SEARCH_DISTANCE) {
-            stop = get_distance_1(wword, top, NULL, dictionary);
-          } else {
-            stop = get_distance_1(wword, top, sbd[d - 1], dictionary);
-            hashtable_insert(tried, top);
-          }
-          if (stop)
-            break;
-        }
-      }
+  HashTable attempts = hashtable_init(100U, (CopyFunction) id,
+                  (CompareFunction) compare_wd, (DestroyFunction) destroy_wd,
+                  (HashFunction) hash_wd);
+  WordDistance wd = init_wd(wword->word, 0);
+  hashtable_insert(attempts, wd);
+  stop = get_distance_1(wword, wd, dictionary, attempts);
+  
+  for (unsigned d = 1; !stop && d <= MAX_SEARCH_DISTANCE; ++d) {
+    for (unsigned i = 0; i < hashtable_size(attempts); ++i) {
+      WordDistance wd = hashtable_elems(attempts)[i];
+      if (wd == NULL || wd->distance != d - 1 || strchr(wd->word, ' ') != NULL)
+        continue;
+      if (d == MAX_SEARCH_DISTANCE)
+        // No se inserta la palabra ya que no interesa la siguiente distancia
+        stop = get_distance_1(wword, wd, dictionary, NULL);
+      else
+        stop = get_distance_1(wword, wd, dictionary, attempts);
+      
+      if (stop)
+        break;
     }
   }
-  for (int i = 0; i < MAX_SEARCH_DISTANCE - 1; glist_free(sbd[i++], free));
-  hashtable_free(tried);
+  hashtable_free(attempts);
 }
 
 HashTable check_file(const char* input, Trie dictionary) {

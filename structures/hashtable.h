@@ -24,6 +24,11 @@ unsigned hashtable_nelems(HashTable table);
  */
 unsigned hashtable_size(HashTable table);
 
+/*
+ * FIXME: Try to avoid this
+*/
+void** hashtable_elems(HashTable table);
+
 /**
  * Destroys the table
  */

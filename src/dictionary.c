@@ -37,7 +37,7 @@ int add_suggestion_wrongword(WrongWord w, char *suggestion) {
     return 0;
 }
 
-Trie create_dictionary(const char* path, unsigned *len) {
+Trie create_dictionary(const char* path) {
   FILE* fp = fopen(path, "r");
   if (fp == NULL) {
     fprintf(stderr, "No se pudo abrir el diccionario \"%s\"\n", path);
@@ -46,9 +46,10 @@ Trie create_dictionary(const char* path, unsigned *len) {
 
   char buf[MAX_LEN_WORD + 1];
 
+  unsigned _len;
   Trie root = trie_init();
   
-  while (read_word(fp, buf, len))
+  while (read_word(fp, buf, &_len))
     trie_insert(root, buf);
 
   fclose(fp);

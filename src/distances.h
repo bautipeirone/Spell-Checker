@@ -3,9 +3,9 @@
 
 #include "../utils.h"
 #include "checker.h"
+#include "dictionary.h"
 #include "../structures/trie.h"
 #include "../structures/hashtable.h"
-#include "../structures/glist.h"
 
 // Estructura que mantiene referencia de la distancia a cierta palabra
 typedef struct _WordDistance {
@@ -19,17 +19,19 @@ int compare_wd(WordDistance w1, WordDistance w2);
 
 void destroy_wd(WordDistance w);
 
-int insert(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary);
+unsigned hash_wd(WordDistance w);
 
-int replace(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary);
+int insert(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, HashTable attempts);
 
-int swap(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary);
+int replace(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, HashTable attempts);
 
-int delete(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary);
+int swap(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, HashTable attempts);
 
-int split(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary);
+int delete(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, HashTable attempts);
 
-int get_distance_1(WrongWord wword, const char* word, GList list, Trie dictionary);
+int split(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, HashTable attempts);
+
+int get_distance_1(WrongWord wword, WordDistance wd, Trie dictionary, HashTable attempts);
 
 /*
  * Calcula la cantidad de inserciones, reemplazos, eliminaciones y

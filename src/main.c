@@ -6,10 +6,9 @@ int main(int argc, const char* argv[]) {
   if (argc != 3)
     usage(); 
   
-  unsigned dict_size = 0;
   const char* dictionary_path = "diccionario.txt";
 
-  Trie dict = create_dictionary(dictionary_path, &dict_size);
+  Trie dict = create_dictionary(dictionary_path);
   HashTable corrections = check_file(argv[1], dict);
   write_corrections(argv[2], corrections);
   

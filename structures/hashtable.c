@@ -57,6 +57,8 @@ unsigned hashtable_nelems(HashTable table) { return table->num_elems; }
  */
 unsigned hashtable_size(HashTable table) { return table->size; }
 
+void** hashtable_elems(HashTable table) { return table->elems; }
+
 static inline float charge_factor(HashTable table) {
   return ((float) table->num_elems / (float) table->size);
 }
@@ -148,7 +150,7 @@ void hashtable_resize(HashTable table) {
   unsigned tmp_size = table->size;
   table->size *= 2;
   table->num_elems = 0;
-  table->elems = malloc(sizeof(void*) * table->size);
+  table->elems = calloc(table->size, sizeof(void*));
   assert(table->elems != NULL);
   
   CopyFunction copy = table->copy;
@@ -160,7 +162,6 @@ void hashtable_resize(HashTable table) {
     if (tmp_elems[i] == NULL || tmp_elems[i] == REMOVED)
       continue;
     hashtable_insert(table, tmp_elems[i]);
-    table->destroy(tmp_elems[i]);
   }
 
   table->copy = copy;

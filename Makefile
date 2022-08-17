@@ -29,8 +29,8 @@ tests: tests/main.o $(SOURCE_O) $(STRUCTURES_O)
 
 # Compilar para depuracion
 .PHONY: debug
-debug:
-	$(CC) -g $(CFLAGS) $(SOURCE) $(STRUCTURES) utils.c -o $(BIN)
+debug: src/main.o
+	$(CC) -g $(CFLAGS) src/main.o $(SOURCE) $(STRUCTURES) utils.c -o $(BIN)
 
 # Remover archivos .o, ejecutables, etc
 .PHONY: clean

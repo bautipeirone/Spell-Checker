@@ -46,7 +46,7 @@ int add_suggestion_wrongword(WrongWord w, char *suggestion);
  * estructura trie con el fin de tener busqueda eficiente y ahorrar memoria
  * aprovechando los prefijos que las palabras comparten
 */
-Trie create_dictionary(const char* path, unsigned *len);
+Trie create_dictionary(const char* path);
 
 
 #endif /* __DICT_H__ */

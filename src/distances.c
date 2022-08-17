@@ -49,16 +49,21 @@ void destroy_wd(WordDistance w) {
   free(w);
 }
 
+unsigned hash_wd(WordDistance w) {
+  return KRHash(w->word);
+}
+
 /*            OPERACIONES DE EDICION DE CADENAS            */
 /* ####################################################### */
 
-int insert(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary) {
+int insert(WrongWord wword, WordDistance wd, unsigned const len,
+          Trie dictionary, HashTable attempts) {
   if (len < 1)
     return 0;
   int stop = 0;
   char *buf = malloc(len + 2);
   assert(buf != NULL);
-  strcpy(buf + 1, word);
+  strcpy(buf + 1, wd->word);
   for (unsigned i = 0; i < len + 1 && !stop; ++i) {
     for (char c = 'a'; c <= 'z'; ++c) {
       buf[i] = c;
@@ -66,8 +71,8 @@ int insert(WrongWord wword, const char* word, unsigned const len, GList list, Tr
         stop = add_suggestion_wrongword(wword, buf);
       if (stop)
         break;
-      else if (list != NULL)
-        glist_add_last(list, buf, (CopyFunction) copy_str);
+      else if (attempts != NULL)
+        hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
     }
     buf[i] = buf[i + 1];
   }
@@ -75,24 +80,25 @@ int insert(WrongWord wword, const char* word, unsigned const len, GList list, Tr
   return stop;
 }
 
-int replace(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary) {
+int replace(WrongWord wword, WordDistance wd, unsigned const len,
+              Trie dictionary, HashTable attempts) {
   if (len < 1)
     return 0;
   char *buf = malloc(len + 1);
   assert(buf != NULL);
   char c;
   int stop = 0;
-  strcpy(buf, word);
+  strcpy(buf, wd->word);
   for (unsigned i = 0; i < len && !stop; ++i) {
-    c = word[i];
+    c = wd->word[i];
     for (char x = 'a'; x < 'z'; ++x) {
       buf[i] = x < c ? x : x + 1;
       if (trie_search(dictionary, buf))
         stop = add_suggestion_wrongword(wword, buf);
       if (stop)
         break;
-      else if (list != NULL)
-        glist_add_last(list, buf, (CopyFunction) copy_str);
+      else if (attempts != NULL)
+        hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
     }
     buf[i] = c;
   }
@@ -100,63 +106,63 @@ int replace(WrongWord wword, const char* word, unsigned const len, GList list, T
   return stop;
 }
 
-int swap(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary) {
+int swap(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, HashTable attempts) {
   if (len <= 1)
     return 0;
   int stop = 0;
   char *buf = malloc(len + 1);
   assert(buf != NULL);
-  strcpy(buf, word);
+  strcpy(buf, wd->word);
   for (unsigned i = 0; i < len - 1 && !stop; ++i) {
-    if (word[i] != word[i + 1]) {
-      buf[i] = word[i + 1];
-      buf[i + 1] = word[i];
+    if (wd->word[i] != wd->word[i + 1]) {
+      buf[i] = wd->word[i + 1];
+      buf[i + 1] = wd->word[i];
       if (trie_search(dictionary, buf))
         stop = add_suggestion_wrongword(wword, buf);
       if (stop)
         break;
-      else if (list != NULL)
-        glist_add_last(list, buf, (CopyFunction) copy_str);
-      buf[i] = word[i];
+      else if (attempts != NULL)
+        hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
+      buf[i] = wd->word[i];
     }
   }
   free(buf);
   return stop;
 }
 
-int delete(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary) {
+int delete(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, HashTable attempts) {
   if (len <= 1)
     return 0;
   int stop = 0;
   char *buf = malloc(len);
   assert(buf != NULL);
-  strcpy(buf, word + 1);
+  strcpy(buf, wd->word + 1);
   
   if (trie_search(dictionary, buf))
     stop = add_suggestion_wrongword(wword, buf);
-  if (!stop && list != NULL)
-    glist_add_last(list, buf, (CopyFunction) copy_str);
+  if (!stop && attempts != NULL)
+    hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
   
   for (unsigned i = 0; i < len - 1 && !stop; ++i) {
-    buf[i] = word[i];
+    buf[i] = wd->word[i];
     if (trie_search(dictionary, buf))
       stop = add_suggestion_wrongword(wword, buf);
     if (stop)
       break;
-    else if (list != NULL)
-      glist_add_last(list, buf, (CopyFunction) copy_str);
+    else if (attempts != NULL)
+      hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
   }
   free(buf);
   return stop;
 }
 
-int split(WrongWord wword, const char* word, unsigned const len, GList list, Trie dictionary) {
+int split(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, HashTable attempts) {
   if (len <= 1)
     return 0;
   int stop = 0;
   char *buf = malloc(len + 2);
   assert(buf != NULL);
-  strcpy(buf + 1, word);
+  strcpy(buf + 1, wd->word);
   for (unsigned i = 0; i < len - 1; ++i) {
     buf[i] = buf[i + 1];
     buf[i + 1] = ' ';
@@ -164,24 +170,24 @@ int split(WrongWord wword, const char* word, unsigned const len, GList list, Tri
       stop = add_suggestion_wrongword(wword, buf);
     if (stop)
       break;
-    else if (list != NULL)
-      glist_add_last(list, buf, (CopyFunction) copy_str);
+    else if (attempts != NULL)
+      hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
   }
   free(buf);
   return stop;
 }
 
-int get_distance_1(WrongWord wword, const char* word, GList list, Trie dictionary) {
-  unsigned len = strlen(word);
-  if (insert(wword, word, len, list, dictionary))
+int get_distance_1(WrongWord wword, WordDistance wd, Trie dictionary, HashTable attempts) {
+  unsigned len = strlen(wd->word);
+  if (insert(wword, wd, len, dictionary, attempts))
     return 1;
-  if (replace(wword, word, len, list, dictionary))
+  if (replace(wword, wd, len, dictionary, attempts))
     return 1;
-  if (swap(wword, word, len, list, dictionary))
+  if (swap(wword, wd, len, dictionary, attempts))
     return 1;
-  if (delete(wword, word, len, list, dictionary))
+  if (delete(wword, wd, len, dictionary, attempts))
     return 1;
-  if (split(wword, word, len, list, dictionary))
+  if (split(wword, wd, len, dictionary, attempts))
     return 1;
   return 0;
 }

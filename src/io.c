@@ -41,9 +41,9 @@ void write_correction(WrongWord w, FILE *fp) {
   if (w->num == 0)
     fputs("No se han encontrado sugerencias para la palabra", fp);
   else {
-    fputs("Quizas quiso decir: ", fp);
+    fputs("Quizas quiso decir:", fp);
     for (int i = 0; i < w->num; ++i)
-      fprintf(fp, "%s, ", w->suggests[i]);
+      fprintf(fp, " %s,", w->suggests[i]);
   }
   fputc('\n', fp);
   fputc('\n', fp);
