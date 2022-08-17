@@ -27,8 +27,14 @@ unsigned hash_wrongword(WrongWord w) {
 }
 
 int add_suggestion_wrongword(WrongWord w, char *suggestion) {
-  w->suggests[w->num++] = copy_str(suggestion);
-  return w->num == NUM_SUGGESTS;
+  int stop = 0;
+  for (int i = 0; i < w->num && !stop; ++i)
+    stop = !strcmp(w->suggests[i], suggestion);
+  if (!stop) {
+    w->suggests[w->num++] = copy_str(suggestion);
+    return w->num == NUM_SUGGESTS;
+  } else
+    return 0;
 }
 
 Trie create_dictionary(const char* path, unsigned *len) {
