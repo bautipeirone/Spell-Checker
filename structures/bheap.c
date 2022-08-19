@@ -119,11 +119,16 @@ BHeap bheap_from_array(void** arr, unsigned len, CompareFunction cmp,
   return heap;
 }
 
-void* bheap_remove_max(BHeap heap) {
+void* bheap_get_max(BHeap heap) {
   if (bheap_empty(heap))
-    return NULL;
-  void *element = heap->arr[0];
+    return ;
+  return heap->copy(heap->arr[0]);
+}
+
+void bheap_remove_max(BHeap heap) {
+  if (bheap_empty(heap))
+    return ;
+  heap->destroy(heap->arr[0]);
   heap->arr[0] = heap->arr[--heap->last];
   bheap_sink_element(heap, 0);
-  return element;
 }

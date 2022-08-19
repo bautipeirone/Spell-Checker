@@ -3,7 +3,7 @@
 #include "distances.h"
 #include "../structures/hashtable.h"
 
-void make_suggests(WrongWord wword, Trie dictionary) {
+void make_suggests_bf(WrongWord wword, Trie dictionary) {
   int stop = 0;
   HashTable attempts = hashtable_init(100U, (CopyFunction) id,
                   (CompareFunction) compare_wd, (DestroyFunction) destroy_wd,
@@ -28,6 +28,41 @@ void make_suggests(WrongWord wword, Trie dictionary) {
     }
   }
   hashtable_free(attempts);
+}
+
+
+/*
+void make_suggests_ed(WrongWord wword, Trie dictionary) {
+  int stop;
+  BHeap distances_word = calculate_distances(dictionary, wword->word);
+  stop = wword->num == NUM_SUGGESTS;
+  for (int d = 1; d <= MAX_SEARCH_DISTANCE && !stop; ++d) {
+    WordDistance top = bheap_get_max(distances_word);
+    while (top != NULL && top->distance != d && !stop) {
+      stop = add_suggestion_wrongword(wword, top->word);
+      bheap_remove_max(distances_word, heap);
+        
+    }
+  }
+  add_split_suggests(wword, distances_word, dictionary);
+  while (wword->num < NUM_SUGGESTS) {
+
+    WordDistance suggest = bheap_remove_max(distances_word);
+    if (suggest == NULL)
+      break;
+    if (suggest->distance <= MAX_SEARCH_DISTANCE)
+      add_suggestion_wrongword(wword, suggest->word);
+    destroy_wd(suggest);
+  }
+  //bheap_destroy(distances_word);
+}
+}*/
+
+void make_suggests(WrongWord wword, Trie dictionary) {
+  if (strlen(wword->word) < 12)
+    make_suggests_bf(wword, dictionary);
+  else
+    make_suggests_ed(wword, dictionary);
 }
 
 HashTable check_file(const char* input, Trie dictionary) {
@@ -68,37 +103,42 @@ HashTable check_file(const char* input, Trie dictionary) {
 
 // Calculo de distancias
 
-/*(Trie root, BHeap heap, int depth,
+void __calculate_distances(Trie root, BHeap heap, int depth,
               char buf[MAX_LEN_WORD + 1], char *str, int len, unsigned *dist1) {
   buf[depth] = root->c;
   if (root->end_of_word && (len - depth) <= MAX_SEARCH_DISTANCE) {
     unsigned distance = edit_distance(str, buf, len, depth + 1);
-    buf[depth + 1] = '\0';
-    bheap_insert(heap, init_wd(buf, distance));
-    if (distance == 1)
-      if (++(*dist1) == NUM_SUGGESTS)
-        return ;
+    if (distance <= MAX_SEARCH_DISTANCE) {
+      buf[depth + 1] = '\0';
+      bheap_insert(heap, init_wd(buf, distance));
+      if (distance == 1)
+        if (++(*dist1) == NUM_SUGGESTS)
+          return ;
     }
+  }
 
   if (depth - len > MAX_SEARCH_DISTANCE)
     return ;
 
   for (int i = 0; i < NCHARS; ++i) {
-    if (root->children[i] != NULL) (root->children[i], 
-                        heap, depth + 1, buf, str, len, dist1);
+    if (root->children[i] != NULL) 
+      __calculate_distances(root->children[i], heap, 
+                            depth + 1, buf, str, len, dist1);
     if (*dist1 == NUM_SUGGESTS)
       return ;
-    }
   }
   return ;
-}(Trie root, char *str) {
+}
+
+BHeap calculate_distances(Trie root, char *str) {
   unsigned dist1 = 0; // Keeps track of distance 1 words found
   char buf[MAX_LEN_WORD + 1];
-  BHeap heap = bheap_init(100, (CompareFunction) compare_wd, id,
+  BHeap heap = bheap_init(1000U, (CompareFunction) compare_wd, id,
                           (DestroyFunction) destroy_wd);
   // Check suggestions have the right priority in the heap
   for (int i = 0; i < NCHARS && dist1 < NUM_SUGGESTS; ++i)
-    if (root->children[i](root->children[i], heap, 0, buf, str, strlen(str), &dist1);
+    if (root->children[i])
+      __calculate_distances(root->children[i], heap, 0, buf, str,
+                                strlen(str), &dist1);
   return heap;
 }
-*/

@@ -13,62 +13,58 @@ typedef struct _BHeap {
 } *BHeap;
 
 /*
- * Initializes a heap with a size given and the provided compare, copy
- * and destroy function
+ * Inicializa un heap con el tamaño y las funciones dadas
 */
 BHeap bheap_init(size_t size, CompareFunction cmp, CopyFunction copy,
                 DestroyFunction destroy);
 
 /*
- * Destroy the heap
+ * Destruye un heap
 */
 void bheap_destroy(BHeap heap);
 
 /*
- * Returns 1 if heap is empty, 0 otherwise
+ * Evalua si el heap esta vacio o no
 */
 int bheap_empty(BHeap heap);
 
 /*
- * Iterate over all the elements on the heap applying the visit function
+ * Itera sobre los elementos del heap aplicando la funcion
 */
 void bheap_iter(BHeap heap, VisitFunction visit);
 
 /*
- * Inserts data in the heap, preserving its structure
+ * Inserta un dato en el heap en su posicion
 */
 void bheap_insert(BHeap heap, void *data);
 
 /*
- * Removes data from the heap if found, preserving the
- * structure of a binary heap
+ * Remueve el dato del heap si este se encuentra, preservando la estructura
 */
 void bheap_remove(BHeap heap, void *data);
 
 /*
- * Resizes the heap to the double of its capacity
+ * Redimensiona el heap
 */
 void bheap_resize(BHeap heap);
 
 /*
- * Remove and return the max element of the heap while
- * preserving the structure
+ * Retorna una copia del dato con mayor prioridad
 */
-void* bheap_remove_max(BHeap heap);
+void* bheap_get_max(BHeap heap);
 
 /*
- * Creates a binary heap from an array
+ * Remueve el dato mayor del heap, preservando su estructura
 */
-BHeap bheap_from_array(void **arr, unsigned len, CompareFunction cmp,
-                        CopyFunction copy, DestroyFunction destroy);
+void bheap_remove_max(BHeap heap);
 
 /*
- * Sifts an element up until the condition of a binary heap is satisfied
+ * Flota el elemento en la posicion dada hasta su ubicacion correcta
 */
 void bheap_float_element(BHeap heap, unsigned pos);
 
 /*
- * Sifts an element down until the condition of a binary heap is satisfied
+ * Hunde el elemento en la posicion dada hasta su ubicacion correcta
 */
 void bheap_sink_element(BHeap heap, unsigned pos);
 

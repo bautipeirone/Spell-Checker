@@ -72,7 +72,8 @@ int insert(WrongWord wword, WordDistance wd, unsigned const len,
       if (stop)
         break;
       else if (attempts != NULL)
-        hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
+        if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
+          hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
     }
     buf[i] = buf[i + 1];
   }
@@ -98,7 +99,8 @@ int replace(WrongWord wword, WordDistance wd, unsigned const len,
       if (stop)
         break;
       else if (attempts != NULL)
-        hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
+        if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
+          hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
     }
     buf[i] = c;
   }
@@ -122,7 +124,8 @@ int swap(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, 
       if (stop)
         break;
       else if (attempts != NULL)
-        hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
+        if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
+          hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
       buf[i] = wd->word[i];
     }
   }
@@ -141,7 +144,8 @@ int delete(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary
   if (trie_search(dictionary, buf))
     stop = add_suggestion_wrongword(wword, buf);
   if (!stop && attempts != NULL)
-    hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
+    if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
+      hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
   
   for (unsigned i = 0; i < len - 1 && !stop; ++i) {
     buf[i] = wd->word[i];
@@ -150,7 +154,8 @@ int delete(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary
     if (stop)
       break;
     else if (attempts != NULL)
-      hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
+      if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
+        hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
   }
   free(buf);
   return stop;
@@ -171,7 +176,8 @@ int split(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary,
     if (stop)
       break;
     else if (attempts != NULL)
-      hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
+      if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
+        hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
   }
   free(buf);
   return stop;
