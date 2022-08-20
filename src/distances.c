@@ -1,17 +1,11 @@
 #include "distances.h"
 
-static int valid_suggestion(char* word, Trie dictionary) {
+static int valid_split(char* word, Trie dictionary) {
   int result;
-  char* copy = copy_str(word); // TODO: remove copy
-  char* space = strchr(copy, ' ');
-  if (space == NULL) // La sugerencia consta de una sola palabra
-    result = trie_search(dictionary, word);
-  else {
-    *space = '\0';
-    result = trie_search(dictionary, copy) && trie_search(dictionary, space + 1);
-    *space = ' ';
-  }
-  free(copy);
+  char* space = strchr(word, ' ');
+  *space = '\0';
+  result = trie_search(dictionary, word) && trie_search(dictionary, space + 1);
+  *space = ' ';
   return result;
 }
 
@@ -27,6 +21,7 @@ static inline int min3(int x, int y, int z) {
   return min(min(x, y), z);
 }
 
+__attribute__((unused))
 static inline int min4(const int x, const int y, const int z, const int w) {
   return min(min(x, y), min(z,w));
 }
@@ -56,14 +51,15 @@ unsigned hash_wd(WordDistance w) {
 /*            OPERACIONES DE EDICION DE CADENAS            */
 /* ####################################################### */
 
-int insert(WrongWord wword, WordDistance wd, unsigned const len,
-          Trie dictionary, HashTable attempts) {
+int insert(WrongWord wword, char* str, unsigned len, Trie dictionary,
+        HashTable attempts) {// , unsigned dist, HashTable prev_attempts[]) {
   if (len < 1)
     return 0;
-  int stop = 0;
+  int stop = 0; //, insert_flag = 1;
   char *buf = malloc(len + 2);
   assert(buf != NULL);
-  strcpy(buf + 1, wd->word);
+  buf[len + 1] = '\0';
+  strcpy(buf + 1, str);
   for (unsigned i = 0; i < len + 1 && !stop; ++i) {
     for (char c = 'a'; c <= 'z'; ++c) {
       buf[i] = c;
@@ -71,9 +67,14 @@ int insert(WrongWord wword, WordDistance wd, unsigned const len,
         stop = add_suggestion_wrongword(wword, buf);
       if (stop)
         break;
-      else if (attempts != NULL)
-        if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
-          hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
+      /*for (unsigned j = 0; j < dist; ++j)
+        // La palabra ya fue agregada anteriormente, por lo que no es necesario
+        // agregarla a la tabla con sugerencia con la distancia actual
+        if (hashtable_search(prev_attempts[j], buf))
+          insert_flag = 0;
+      */
+      if (attempts != NULL)
+        hashtable_insert(attempts, buf);
     }
     buf[i] = buf[i + 1];
   }
@@ -81,26 +82,31 @@ int insert(WrongWord wword, WordDistance wd, unsigned const len,
   return stop;
 }
 
-int replace(WrongWord wword, WordDistance wd, unsigned const len,
-              Trie dictionary, HashTable attempts) {
+int replace(WrongWord wword, char* str, unsigned len, Trie dictionary,
+        HashTable attempts) {//, unsigned dist, HashTable prev_attempts[]) {
   if (len < 1)
     return 0;
   char *buf = malloc(len + 1);
   assert(buf != NULL);
+  buf[len] = '\0';
   char c;
-  int stop = 0;
-  strcpy(buf, wd->word);
+  int stop = 0;//, insert_flag = 1;
+  strcpy(buf, str);
   for (unsigned i = 0; i < len && !stop; ++i) {
-    c = wd->word[i];
+    c = str[i];
     for (char x = 'a'; x < 'z'; ++x) {
       buf[i] = x < c ? x : x + 1;
       if (trie_search(dictionary, buf))
         stop = add_suggestion_wrongword(wword, buf);
       if (stop)
         break;
-      else if (attempts != NULL)
-        if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
-          hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
+      /*for (unsigned j = 0; j < dist; ++j)
+        // La palabra ya fue agregada anteriormente, por lo que no es necesario
+        // agregarla a la tabla con sugerencia con la distancia actual
+        if (hashtable_search(prev_attempts[j], buf))
+          insert_flag = 0;*/
+      if (attempts != NULL)
+        hashtable_insert(attempts, buf);
     }
     buf[i] = c;
   }
@@ -108,98 +114,110 @@ int replace(WrongWord wword, WordDistance wd, unsigned const len,
   return stop;
 }
 
-int swap(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, HashTable attempts) {
+int swap(WrongWord wword, char* str, unsigned len, Trie dictionary,
+        HashTable attempts) {//, unsigned dist, HashTable prev_attempts[]) {
   if (len <= 1)
     return 0;
-  int stop = 0;
+  int stop = 0;//, insert_flag = 1;
   char *buf = malloc(len + 1);
   assert(buf != NULL);
-  strcpy(buf, wd->word);
+  buf[len] = '\0';
+  strcpy(buf, str);
   for (unsigned i = 0; i < len - 1 && !stop; ++i) {
-    if (wd->word[i] != wd->word[i + 1]) {
-      buf[i] = wd->word[i + 1];
-      buf[i + 1] = wd->word[i];
+    if (str[i] != str[i + 1]) {
+      buf[i] = str[i + 1];
+      buf[i + 1] = str[i];
       if (trie_search(dictionary, buf))
         stop = add_suggestion_wrongword(wword, buf);
-      if (stop)
-        break;
-      else if (attempts != NULL)
-        if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
-          hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
-      buf[i] = wd->word[i];
+      /*for (unsigned j = 0; j < dist; ++j)
+        // La palabra ya fue agregada anteriormente, por lo que no es necesario
+        // agregarla a la tabla con sugerencia con la distancia actual
+        if (hashtable_search(prev_attempts[j], buf))
+          insert_flag = 0;*/
+      if (attempts != NULL)
+        hashtable_insert(attempts, buf);
+      buf[i] = str[i];
     }
   }
   free(buf);
   return stop;
 }
 
-int delete(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, HashTable attempts) {
+int delete(WrongWord wword, char* str, unsigned len, Trie dictionary,
+        HashTable attempts) {//, unsigned dist, HashTable prev_attempts[]) {
   if (len <= 1)
     return 0;
-  int stop = 0;
+  int stop = 0;//, insert_flag = 1;
   char *buf = malloc(len);
   assert(buf != NULL);
-  strcpy(buf, wd->word + 1);
-  
-  if (trie_search(dictionary, buf))
-    stop = add_suggestion_wrongword(wword, buf);
-  if (!stop && attempts != NULL)
-    if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
-      hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
-  
-  for (unsigned i = 0; i < len - 1 && !stop; ++i) {
-    buf[i] = wd->word[i];
+  buf[len - 1] = '\0';
+  strcpy(buf, str + 1);
+  unsigned i = 0;
+  do {
     if (trie_search(dictionary, buf))
       stop = add_suggestion_wrongword(wword, buf);
-    if (stop)
-      break;
-    else if (attempts != NULL)
-      if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
-        hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
-  }
+    /*for (unsigned j = 0; j < dist; ++j)
+        // La palabra ya fue agregada anteriormente, por lo que no es necesario
+        // agregarla a la tabla con sugerencia con la distancia actual
+        if (hashtable_search(prev_attempts[j], buf))
+          insert_flag = 0;*/
+    if (attempts != NULL)
+      hashtable_insert(attempts, buf);
+    buf[i] = str[i];
+    ++i;
+  } while (i < len && !stop);
+  
   free(buf);
   return stop;
 }
 
-int split(WrongWord wword, WordDistance wd, unsigned const len, Trie dictionary, HashTable attempts) {
+int split(WrongWord wword, char* str, unsigned len, Trie dictionary,
+        HashTable attempts) {//, unsigned dist, HashTable prev_attempts[]) {
   if (len <= 1)
     return 0;
-  int stop = 0;
+  int stop = 0;//, insert_flag = 1;
+  
   char *buf = malloc(len + 2);
   assert(buf != NULL);
-  strcpy(buf + 1, wd->word);
-  for (unsigned i = 0; i < len - 1; ++i) {
+  buf[len + 1] = '\0';
+  strcpy(buf + 1, str);
+
+  for (unsigned i = 0; i < len - 1 && !stop; ++i) {
     buf[i] = buf[i + 1];
     buf[i + 1] = ' ';
-    if (valid_suggestion(buf, dictionary))
+    if (valid_split(buf, dictionary))
       stop = add_suggestion_wrongword(wword, buf);
-    if (stop)
-      break;
-    else if (attempts != NULL)
-      if (hashtable_search(attempts, &( (struct _WordDistance) { buf } )) == NULL)
-        hashtable_insert(attempts, init_wd(buf, wd->distance + 1));
+    /*for (unsigned j = 0; j < dist; ++j)
+        // La palabra ya fue agregada anteriormente, por lo que no es necesario
+        // agregarla a la tabla con sugerencia con la distancia actual
+        if (hashtable_search(prev_attempts[j], buf))
+          insert_flag = 0;*/
+    if (attempts != NULL)
+      hashtable_insert(attempts, buf);
   }
   free(buf);
   return stop;
 }
 
-int get_distance_1(WrongWord wword, WordDistance wd, Trie dictionary, HashTable attempts) {
-  unsigned len = strlen(wd->word);
-  if (insert(wword, wd, len, dictionary, attempts))
+int get_distance_1(WrongWord wword, char* str, Trie dictionary,
+              HashTable attempts) {// ) {
+  unsigned len = strlen(str);
+  if (insert(wword, str, len, dictionary, attempts)) //, dist, prev_attempts))
     return 1;
-  if (replace(wword, wd, len, dictionary, attempts))
+  if (replace(wword, str, len, dictionary, attempts)) //, dist, prev_attempts))
     return 1;
-  if (swap(wword, wd, len, dictionary, attempts))
+  if (swap(wword, str, len, dictionary, attempts)) //, dist, prev_attempts))
     return 1;
-  if (delete(wword, wd, len, dictionary, attempts))
+  if (delete(wword, str, len, dictionary, attempts)) //, dist, prev_attempts))
     return 1;
-  if (split(wword, wd, len, dictionary, attempts))
+  if (split(wword, str, len, dictionary, attempts)) //, dist, prev_attempts))
     return 1;
   return 0;
 }
 
 /* ####################################################################### */
 
+/*
 unsigned edit_distance(char *str1, char *str2, unsigned len1, unsigned len2) {
   // Memoria O(m), m = len2
   // Tiempo O(n * m), n = len1, m = len2
@@ -252,7 +270,6 @@ unsigned edit_distance(char *str1, char *str2, unsigned len1, unsigned len2) {
   return result;
 }
 
-/*
 unsigned edit_distance(char *str1, char *str2, unsigned len1, unsigned len2) {
   unsigned *distances = malloc(sizeof(unsigned) * (len2 + 1));
   unsigned *buffer = malloc(sizeof(unsigned) * (len2 + 1));
