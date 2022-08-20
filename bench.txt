@@ -39,4 +39,10 @@ z.txt: 1.44s user 0.15s system 97% cpu 1.635 total
 input.txt: 1.18s user 0.16s system 92% cpu 1.451 total
 lorem.txt: 12.46s user 0.18s system 99% cpu 12.690 total
 
+Brute Force Implementation (Bug Correction - HashTables by distance)
+z.txt: 1.67s user 0.17s system 97% cpu 1.878 total
+input.txt: 1.26s user 0.19s system 93% cpu 1.546 total
+lorem.txt: 15.70s user 0.24s system 98% cpu 16.178 total
+
 Hybrid Implementation (Brute Force and Distance Calculation)
+

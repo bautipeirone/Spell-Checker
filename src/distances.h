@@ -22,17 +22,17 @@ void destroy_wd(WordDistance w);
 unsigned hash_wd(WordDistance w);
 
 int insert(WrongWord wword, char* str, unsigned len, Trie dictionary,
-              HashTable attempts, unsigned dist, HashTable prev_attempts[]);
+              HashTable attempts);//, unsigned dist, HashTable prev_attempts[]);
 int replace(WrongWord wword, char* str, unsigned len, Trie dictionary,
-              HashTable attempts, unsigned dist, HashTable prev_attempts[]);
+              HashTable attempts);//, unsigned dist, HashTable prev_attempts[]);
 int swap(WrongWord wword, char* str, unsigned len, Trie dictionary,
-              HashTable attempts, unsigned dist, HashTable prev_attempts[]);
+              HashTable attempts);//, unsigned dist, HashTable prev_attempts[]);
 int delete(WrongWord wword, char* str, unsigned len, Trie dictionary,
-              HashTable attempts, unsigned dist, HashTable prev_attempts[]);
+              HashTable attempts);//, unsigned dist, HashTable prev_attempts[]);
 int split(WrongWord wword, char* str, unsigned len, Trie dictionary,
-              HashTable attempts, unsigned dist, HashTable prev_attempts[]);
+              HashTable attempts);//, unsigned dist, HashTable prev_attempts[]);
 int get_distance_1(WrongWord wword, char* str, Trie dictionary,
-              HashTable attempts, unsigned dist, HashTable prev_attempts[]);
+              HashTable attempts);//, unsigned dist, HashTable prev_attempts[]);
 /*
  * Calcula la cantidad de inserciones, reemplazos, eliminaciones y
  * trasposiciones para pasar de str1 a str2

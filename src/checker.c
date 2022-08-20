@@ -12,7 +12,7 @@ void make_suggests(WrongWord wword, Trie dictionary) {
     assert(attempts[i - 1] != NULL);
   }
 
-  stop = get_distance_1(wword, wword->word, dictionary, attempts[0], 0, NULL);
+  stop = get_distance_1(wword, wword->word, dictionary, attempts[0]);// , 0, NULL);
   for (unsigned d = 1; !stop && d < MAX_SEARCH_DISTANCE; ++d) {
     for (unsigned i = 0; i < hashtable_size(attempts[d - 1]); ++i) {
       if (hashtable_elems(attempts[d - 1])[i] == NULL)
@@ -22,9 +22,9 @@ void make_suggests(WrongWord wword, Trie dictionary) {
         continue;
       if (d == MAX_SEARCH_DISTANCE - 1)
          // No se inserta la palabra ya que no interesa la siguiente distancia
-        stop = get_distance_1(wword, suggest, dictionary, NULL, 0, NULL);
+        stop = get_distance_1(wword, suggest, dictionary, NULL);//, 0, NULL);
       else
-        stop = get_distance_1(wword, suggest, dictionary, attempts[d], d, attempts);
+        stop = get_distance_1(wword, suggest, dictionary, attempts[d]); //, d, attempts);
       if (stop)
         break;
     }
