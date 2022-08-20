@@ -5,29 +5,32 @@
 
 void make_suggests(WrongWord wword, Trie dictionary) {
   int stop = 0;
-  HashTable attempts = hashtable_init(100U, (CopyFunction) id,
-                  (CompareFunction) compare_wd, (DestroyFunction) destroy_wd,
-                  (HashFunction) hash_wd);
-  WordDistance wd = init_wd(wword->word, 0);
-  hashtable_insert(attempts, wd);
-  stop = get_distance_1(wword, wd, dictionary, attempts);
-  
-  for (unsigned d = 1; !stop && d <= MAX_SEARCH_DISTANCE; ++d) {
-    for (unsigned i = 0; i < hashtable_size(attempts); ++i) {
-      WordDistance wd = hashtable_elems(attempts)[i];
-      if (wd == NULL || wd->distance != d - 1 || strchr(wd->word, ' ') != NULL)
+  HashTable attempts[MAX_SEARCH_DISTANCE - 1];
+  for (int i = 0; i < MAX_SEARCH_DISTANCE - 1; ++i) {
+    attempts[i] = hashtable_init(100U, (CopyFunction) copy_str,
+      (CompareFunction) strcmp, (DestroyFunction) free, (HashFunction) KRHash);
+    assert(attempts[i - 1] != NULL);
+  }
+
+  stop = get_distance_1(wword, wword->word, dictionary, attempts[0], 0, NULL);
+  for (unsigned d = 1; !stop && d < MAX_SEARCH_DISTANCE; ++d) {
+    for (unsigned i = 0; i < hashtable_size(attempts[d - 1]); ++i) {
+      if (hashtable_elems(attempts[d - 1])[i] == NULL)
         continue;
-      if (d == MAX_SEARCH_DISTANCE)
-        // No se inserta la palabra ya que no interesa la siguiente distancia
-        stop = get_distance_1(wword, wd, dictionary, NULL);
+      char* suggest = hashtable_elems(attempts[d - 1])[i];
+      if (strchr(suggest, ' ') != NULL)
+        continue;
+      if (d == MAX_SEARCH_DISTANCE - 1)
+         // No se inserta la palabra ya que no interesa la siguiente distancia
+        stop = get_distance_1(wword, suggest, dictionary, NULL, 0, NULL);
       else
-        stop = get_distance_1(wword, wd, dictionary, attempts);
-      
+        stop = get_distance_1(wword, suggest, dictionary, attempts[d], d, attempts);
       if (stop)
         break;
     }
   }
-  hashtable_free(attempts);
+  for (int i = 0; i < MAX_SEARCH_DISTANCE - 1; ++i)
+    hashtable_free(attempts[i]);
 }
 
 HashTable check_file(const char* input, Trie dictionary) {
