@@ -11,5 +11,6 @@ structures/*.o
 .DS_Store
 .vscode
 .git
+dc.txt
+*_out.txt
 *.dSYM
-output.txt

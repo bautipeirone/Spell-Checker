@@ -12,13 +12,6 @@ unsigned KRHash(char *s) {
   return hashval;
 }
 
-char* copy_str(const char *str) {
-  char *copy = malloc(strlen(str) + 1);
-  assert(copy != NULL);
-  strcpy(copy, str);
-  return copy;
-}
-
 int* copy_int(int *p) {
   int* copy = malloc(sizeof(int));
   assert(copy != NULL);

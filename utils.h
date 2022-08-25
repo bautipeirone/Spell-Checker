@@ -49,11 +49,6 @@ void null(void *p);
 unsigned KRHash(char *s);
 
 /*
- * Retorna una copia del string
-*/
-char* copy_str(const char *str);
-
-/*
  * Retorna una copia del int
 */
 int* copy_int(int *p);

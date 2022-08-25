@@ -121,7 +121,7 @@ BHeap bheap_from_array(void** arr, unsigned len, CompareFunction cmp,
 
 void* bheap_get_max(BHeap heap) {
   if (bheap_empty(heap))
-    return ;
+    return NULL;
   return heap->copy(heap->arr[0]);
 }
 

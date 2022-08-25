@@ -46,3 +46,10 @@ lorem.txt: 15.70s user 0.24s system 98% cpu 16.178 total
 
 Hybrid Implementation (Brute Force and Distance Calculation)
 
+long.txt      | 64.85s user  1.05s system  1:13.08 total
+              |
+lorem.txt     | 14.23s user  0.21s system  14.675 total
+              |
+z.txt         | 1.58s  user  0.15s system  1.749 total
+              |
+input.txt     | 1.34s  user  0.25s system  1.672 total
