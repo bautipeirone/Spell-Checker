@@ -4,41 +4,38 @@
 #include "../utils.h"
 #include "glist.h"
 
-typedef GList GQueue;
+typedef struct _GQueue {
+  GList first, last;
+} *GQueue;
 
 /*
-  ** Returns an empty queue
+ * Retorna una cola vacia 
 */
 GQueue gqueue_init();
 
 /*
-  ** Destroys a queue
+ * Destruye una cola
 */
 void gqueue_free(GQueue q, DestroyFunction destroy);
 
 /*
-  ** Returns if the queue is empty or not
+ * Retorna 1 si es cola esta vacia, 0 en caso contrario
 */
 int gqueue_empty(GQueue q);
 
 /*
-  ** Returns a copy of the data on the start of the queue
+ * Retorna una copia del dato al comienzo de la cola, NULL si la cola esta vacia
 */
 void* gqueue_start(GQueue q, CopyFunction copy);
 
 /*
-  ** Pushes data to the end of the queue
+ * Inserta una copia del dato al final de la cola
 */
 void gqueue_push(GQueue q, void *data, CopyFunction copy);
 
 /*
-  ** Removes the start of the queue
+ * Remueve el elemento al comienzo de la cola
 */
 void gqueue_pop(GQueue q, DestroyFunction destroy);
-
-/*
-  ** Prints the queue from the start to the end
-*/
-void gqueue_print(GQueue q, void (*print)(void *data));
 
 #endif // _GQUEUE_H_

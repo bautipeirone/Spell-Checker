@@ -7,7 +7,9 @@ make
 
 for file in $DIR/* ; do
 	output=$(basename "$file" .txt)$EXT
-  echo time ./main "$file" "$output"
+  echo "Ejecutando correcion sobre $file"
+  time ./main "$file" "$output"
+  echo "---------------------------------"
 done
 
 make clean

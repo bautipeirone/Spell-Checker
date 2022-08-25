@@ -6,10 +6,10 @@
 #include "../structures/gqueue.h"
 
 typedef struct _WrongWord {
-	char *word;
-	char *suggests[NUM_SUGGESTS];
-	int num;
-  GQueue lines;
+	char *word;                   // Palabra
+	char *suggests[NUM_SUGGESTS]; // Arreglo de sugerencias
+	int num;                      // Numero de sugerencias hechas
+  GQueue lines;                 // Numeros de linea donde aparece la palabra
 } *WrongWord;
 
 /*
@@ -43,8 +43,7 @@ int add_suggestion_wrongword(WrongWord w, char *suggestion);
 
 /*
  * Lee el archivo path con formato diccionario y almacena las palabras en una
- * estructura trie con el fin de tener busqueda eficiente y ahorrar memoria
- * aprovechando los prefijos que las palabras comparten
+ * estructura trie
 */
 Trie create_dictionary(const char* path);
 

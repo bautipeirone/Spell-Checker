@@ -1,7 +1,13 @@
 #include "io.h"
 
+void get_dict_path(char path[]) {
+  puts("Inserte el path del diccionario: ");
+  scanf("%s", path);
+}
+
 int read_word(FILE* fp, char buf[MAX_LEN_WORD + 1], unsigned *line_number) {
   int c, i = 0, stop = 0;
+  // Se avanza hasta la proxima palabra
   do {
     c = fgetc(fp);
     if (c == '\n')
@@ -13,6 +19,7 @@ int read_word(FILE* fp, char buf[MAX_LEN_WORD + 1], unsigned *line_number) {
 
   ungetc(c, fp);
   
+  // Se llena el buffer hasta completar la palabra o finalizar el archivo
   while (i < MAX_LEN_WORD && !stop) {
     c = getc(fp);
     if (c == EOF) {

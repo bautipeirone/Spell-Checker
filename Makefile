@@ -23,10 +23,6 @@ all: src/main.o $(SOURCE_O) $(STRUCTURES_O)
 %.o: %.c
 	$(CC) -c $(CFLAGS) $^ -o $@
 
-# Compilar tests
-tests: tests/main.o $(SOURCE_O) $(STRUCTURES_O)
-	$(CC) $(CFLAGS) $^ utils.c -o test
-
 # Compilar para depuracion
 .PHONY: debug
 debug: src/main.o

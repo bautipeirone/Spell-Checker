@@ -4,16 +4,16 @@
 #include "../utils.h"
 
 struct TrieNode {
-  char c;
-  struct TrieNode *children[NCHARS];
-  int end_of_word;
-};
+  char c;                             // Caracter que representa el nodo
+  struct TrieNode *children[NCHARS];  // Arreglo de hijos
+  char end_of_word;                   // Caracter usado como bool, indica si
+};                                    // el nodo representa una palabra completa
 
 typedef struct TrieNode *Trie;
 
 int trie_empty(Trie root);
 
-Trie trie_init();
+Trie trie_init(char c);
 
 void trie_insert(Trie root, const char* str);
 

@@ -6,8 +6,13 @@
 #include "../utils.h"
 #include "../structures/hashtable.h"
 
+/*
+ * Retorna el nombre del archivo del diccionario
+*/
+void get_dict_path(char path[]);
+
 /* 
- * Guarda la siguiente palabra encontrada en el archivo al buffer
+ * Guarda la siguiente palabra encontrada en el archivo al buffer,
  * retorna 0 si se ha finalizado la lectura del archivo, 1 en caso contrario
 */
 int read_word(FILE* fp, char buf[MAX_LEN_WORD + 1], unsigned *line_number);

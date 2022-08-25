@@ -2,61 +2,59 @@
 #define __HASHTABLE_H__
 
 #include "../utils.h"
-#define CHARGE_FACTOR_THRESH 0.7F
+#define CHARGE_FACTOR_THRESH 0.7
 
 typedef struct _HashTable *HashTable;
 
 /**
- * Initializes a hash table with a size given, and the required
- * functions used in the table
- */
+ * Crea una tabla hash con el tamaño y las funciones dadas
+*/
 HashTable hashtable_init(unsigned size, CopyFunction copy,
                           CompareFunction cmp, DestroyFunction destroy,
                           HashFunction hash);
 
 /**
- * Returns the number of elements in the table
- */
+ * Retorna la cantidad de elementos en la tabla
+*/
 unsigned hashtable_nelems(HashTable table);
 
 /**
- * Returns the size of the table
- */
+ * Retorna el tamaño de la tabla
+*/
 unsigned hashtable_size(HashTable table);
 
 /*
- * FIXME: Try to avoid this
+ * Retorna el arreglo de datos de la tabla
 */
 void** hashtable_elems(HashTable table);
 
 /**
- * Destroys the table
- */
+ * Destruye la tabla
+*/
 void hashtable_free(HashTable table);
 
 /**
- * Inserts data in the table, or replaces it if already in the table
+ * Inserta una copia del dato en la tabla, lo sobrescribe si ya estaba
  */
 void hashtable_insert(HashTable table, void *data);
 
 /**
- * Returns the element that matches with data, or NULL if not in the table
+ * Retorna el elemento que coincida con el dato, o NULL si ninguno lo hace
  */
 void* hashtable_search(HashTable table, void *data);
 
 /**
- * Removes the element of the table that matches with data
+ * Remueve el dato de la tabla
  */
 void hashtable_remove(HashTable table, void *data);
 
 /*
- * Resize the table to the double of its size, rehashing all elements
- * in the new table
+ * Duplica el tamaño de la tabla, rehashea los elementos a sus nuevas posiciones
 */
 void hashtable_resize(HashTable table);
 
 /*
- * Applies visit to every non NULL element on the table
+ * Aplica la funcion a todas las casillas no vacias o eliminadas
 */
 void hashtable_iterate(HashTable table, VisitFunctionExtra visit, void *extra);
 
