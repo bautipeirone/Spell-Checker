@@ -16,7 +16,7 @@ del archivo de salida, y ejectuarse como sigue
 ./main entrada.txt output.txt
 ```
 
-## Descripcion
+## Descripcion
 El programa leerá un texto de entrada junto con un archivo diccionario. El texto
 será analizado palabra por palabra, y para aquellas palabras que no se
 encuentren en el diccionario se generaran un numero de sugerencias dentro de un
