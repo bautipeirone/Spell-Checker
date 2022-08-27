@@ -1,8 +1,8 @@
 #include "utils.h"
 
-void *id(void *p) { return p; }
+inline void *id(void *p) { return p; }
 
-void null(void *p) { (void) p; return; }
+inline void null(void *p) { (void) p; return; }
 
 unsigned KRHash(char *s) {
   unsigned hashval;

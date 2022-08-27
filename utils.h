@@ -20,7 +20,7 @@
 #define MAX_SEARCH_DISTANCE 3
 
 // Retorna una copia de dato
-typedef void *(*CopyFunction)(void *data);
+typedef void* (*CopyFunction)(void *data);
 
 // Retorna un entero negativo si data1 < data2, 0 si son iguales, 1 sino
 typedef int (*CompareFunction)(void *data1, void *data2);
@@ -54,13 +54,8 @@ unsigned KRHash(char *s);
 int* copy_int(int *p);
 
 /*
-int min(const int x, const int y);
-
-int min3(int x, int y, int z);
-
-int min4(const int x, const int y, const int z, const int w);
+ * Modifica la cadena, convirtiendola a minusculas
 */
-
 void lower_str(char *str);
 
 #endif /* __UTILS_H__ */

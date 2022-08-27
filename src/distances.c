@@ -9,14 +9,29 @@ static int valid_split(char* word, Trie dictionary) {
   return result;
 }
 
+static int check_duplicate(char* str, unsigned dist, HashTable prev_attempts[]) {
+#ifdef CHECK_DUP
+  int insert_flag = 1;
+  for (unsigned j = 0; j < dist && insert_flag; ++j)
+    // La palabra ya fue agregada anteriormente, por lo que no es necesario
+    // agregarla a la tabla con sugerencia con la distancia actual
+    if (hashtable_search(prev_attempts[j], str))
+      insert_flag = 0;
+  return insert_flag;
+#else
+  (void) str; (void) dist; (void) prev_attempts;
+  return 1;
+#endif
+}
+
 /*            OPERACIONES DE EDICION DE CADENAS            */
 /* ####################################################### */
 
 int insert(WrongWord wword, char* str, unsigned len, Trie dictionary,
-        HashTable attempts) {// , unsigned dist, HashTable prev_attempts[]) {
+        HashTable attempts, unsigned dist, HashTable prev_attempts[]) {
   if (len < 1)
     return 0;
-  int stop = 0; //, insert_flag = 1;
+  int stop = 0;
   char *buf = malloc(len + 2);
   assert(buf != NULL);
   buf[len + 1] = '\0';
@@ -28,13 +43,7 @@ int insert(WrongWord wword, char* str, unsigned len, Trie dictionary,
         stop = add_suggestion_wrongword(wword, buf);
       if (stop)
         break;
-      /*for (unsigned j = 0; j < dist; ++j)
-        // La palabra ya fue agregada anteriormente, por lo que no es necesario
-        // agregarla a la tabla con sugerencia con la distancia actual
-        if (hashtable_search(prev_attempts[j], buf))
-          insert_flag = 0;
-      */
-      if (attempts != NULL)
+      if (attempts != NULL && check_duplicate(buf, dist, prev_attempts))
         hashtable_insert(attempts, buf);
     }
     buf[i] = buf[i + 1];
@@ -44,14 +53,14 @@ int insert(WrongWord wword, char* str, unsigned len, Trie dictionary,
 }
 
 int replace(WrongWord wword, char* str, unsigned len, Trie dictionary,
-        HashTable attempts) {//, unsigned dist, HashTable prev_attempts[]) {
+        HashTable attempts, unsigned dist, HashTable prev_attempts[]) {
   if (len < 1)
     return 0;
   char *buf = malloc(len + 1);
   assert(buf != NULL);
   buf[len] = '\0';
   char c;
-  int stop = 0;//, insert_flag = 1;
+  int stop = 0;
   memcpy(buf, str, len + 1);
   for (unsigned i = 0; i < len && !stop; ++i) {
     c = str[i];
@@ -61,12 +70,7 @@ int replace(WrongWord wword, char* str, unsigned len, Trie dictionary,
         stop = add_suggestion_wrongword(wword, buf);
       if (stop)
         break;
-      /*for (unsigned j = 0; j < dist; ++j)
-        // La palabra ya fue agregada anteriormente, por lo que no es necesario
-        // agregarla a la tabla con sugerencia con la distancia actual
-        if (hashtable_search(prev_attempts[j], buf))
-          insert_flag = 0;*/
-      if (attempts != NULL)
+      if (attempts != NULL && check_duplicate(buf, dist, prev_attempts))
         hashtable_insert(attempts, buf);
     }
     buf[i] = c;
@@ -76,10 +80,10 @@ int replace(WrongWord wword, char* str, unsigned len, Trie dictionary,
 }
 
 int swap(WrongWord wword, char* str, unsigned len, Trie dictionary,
-        HashTable attempts) {//, unsigned dist, HashTable prev_attempts[]) {
+        HashTable attempts, unsigned dist, HashTable prev_attempts[]) {
   if (len <= 1)
     return 0;
-  int stop = 0;//, insert_flag = 1;
+  int stop = 0;
   char *buf = malloc(len + 1);
   assert(buf != NULL);
   buf[len] = '\0';
@@ -90,12 +94,7 @@ int swap(WrongWord wword, char* str, unsigned len, Trie dictionary,
       buf[i + 1] = str[i];
       if (trie_search(dictionary, buf))
         stop = add_suggestion_wrongword(wword, buf);
-      /*for (unsigned j = 0; j < dist; ++j)
-        // La palabra ya fue agregada anteriormente, por lo que no es necesario
-        // agregarla a la tabla con sugerencia con la distancia actual
-        if (hashtable_search(prev_attempts[j], buf))
-          insert_flag = 0;*/
-      if (attempts != NULL)
+      if (attempts != NULL && check_duplicate(buf, dist, prev_attempts))
         hashtable_insert(attempts, buf);
       buf[i] = str[i];
     }
@@ -105,10 +104,10 @@ int swap(WrongWord wword, char* str, unsigned len, Trie dictionary,
 }
 
 int delete(WrongWord wword, char* str, unsigned len, Trie dictionary,
-        HashTable attempts) {//, unsigned dist, HashTable prev_attempts[]) {
+        HashTable attempts, unsigned dist, HashTable prev_attempts[]) {
   if (len <= 1)
     return 0;
-  int stop = 0;//, insert_flag = 1;
+  int stop = 0;
   char *buf = malloc(len);
   assert(buf != NULL);
   buf[len - 1] = '\0';
@@ -117,12 +116,7 @@ int delete(WrongWord wword, char* str, unsigned len, Trie dictionary,
   do {
     if (trie_search(dictionary, buf))
       stop = add_suggestion_wrongword(wword, buf);
-    /*for (unsigned j = 0; j < dist; ++j)
-        // La palabra ya fue agregada anteriormente, por lo que no es necesario
-        // agregarla a la tabla con sugerencia con la distancia actual
-        if (hashtable_search(prev_attempts[j], buf))
-          insert_flag = 0;*/
-    if (attempts != NULL)
+    if (attempts != NULL && check_duplicate(buf, dist, prev_attempts))
       hashtable_insert(attempts, buf);
     buf[i] = str[i];
     ++i;
@@ -135,7 +129,7 @@ int delete(WrongWord wword, char* str, unsigned len, Trie dictionary,
 int split(WrongWord wword, char* str, unsigned len, Trie dictionary) {
   if (len <= 1)
     return 0;
-  int stop = 0;//, insert_flag = 1;
+  int stop = 0;
   
   char *buf = malloc(len + 2);
   assert(buf != NULL);
@@ -153,15 +147,15 @@ int split(WrongWord wword, char* str, unsigned len, Trie dictionary) {
 }
 
 int get_distance_1(WrongWord wword, char* str, Trie dictionary,
-              HashTable attempts) {// ) {
+              HashTable attempts, unsigned dist, HashTable* prev_attempts) {
   unsigned len = strlen(str);
-  if (insert(wword, str, len, dictionary, attempts)) //, dist, prev_attempts))
+  if (insert(wword, str, len, dictionary, attempts, dist, prev_attempts))
     return 1;
-  if (replace(wword, str, len, dictionary, attempts)) //, dist, prev_attempts))
+  if (replace(wword, str, len, dictionary, attempts, dist, prev_attempts))
     return 1;
-  if (swap(wword, str, len, dictionary, attempts)) //, dist, prev_attempts))
+  if (swap(wword, str, len, dictionary, attempts, dist, prev_attempts))
     return 1;
-  if (delete(wword, str, len, dictionary, attempts)) //, dist, prev_attempts))
+  if (delete(wword, str, len, dictionary, attempts, dist, prev_attempts))
     return 1;
   if (split(wword, str, len, dictionary))
     return 1;
