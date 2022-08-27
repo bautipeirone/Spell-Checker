@@ -1,7 +1,5 @@
 # Ejecutables
 main
-sc
-tests
 
 # Archivos objeto
 src/*.o

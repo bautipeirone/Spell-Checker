@@ -6,7 +6,7 @@ WrongWord init_wrongword(const char *str) {
   assert(w != NULL);
   w->lines = gqueue_init();
   w->num = 0;
-  w->word = strdup(str);
+  w->word = copy_str(str);
   return w;
 }
 
@@ -32,7 +32,7 @@ int add_suggestion_wrongword(WrongWord w, char *suggestion) {
     stop = !strcmp(w->suggests[i], suggestion);
   // Si la sugerencia no fue previamente hecha, se añade como nueva
   if (!stop) {
-    w->suggests[w->num++] = strdup(suggestion);
+    w->suggests[w->num++] = copy_str(suggestion);
     return w->num == NUM_SUGGESTS;
   } else
     return 0;

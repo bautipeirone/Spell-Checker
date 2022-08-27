@@ -1,7 +1,7 @@
 #include "io.h"
 
 void get_dict_path(char path[]) {
-  puts("Inserte el path del diccionario: ");
+  printf("Inserte el path del diccionario: ");
   scanf("%s", path);
 }
 

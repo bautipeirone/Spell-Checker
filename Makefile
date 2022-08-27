@@ -3,6 +3,9 @@
 # Compilador y banderas
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -std=c99
+ifdef CHECK_DUP
+	CFLAGS += -DCHECK_DUP
+endif
 BIN = main
 
 # Archivos fuente
@@ -12,8 +15,6 @@ SOURCE_O = $(SOURCE:c=o)
 
 STRUCTURES = $(wildcard structures/*.c)
 STRUCTURES_O = $(STRUCTURES:c=o)
-
-TESTS = tests/main.c
 
 # Compilar el programa
 all: src/main.o $(SOURCE_O) $(STRUCTURES_O)

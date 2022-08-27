@@ -1,8 +1,8 @@
 #include "utils.h"
 
-void *id(void *p) { return p; }
+inline void *id(void *p) { return p; }
 
-void null(void *p) { (void) p; return; }
+inline void null(void *p) { (void) p; return; }
 
 unsigned KRHash(char *s) {
   unsigned hashval;
@@ -16,6 +16,14 @@ int* copy_int(int *p) {
   int* copy = malloc(sizeof(int));
   assert(copy != NULL);
   *copy = *p;
+  return copy;
+}
+
+char* copy_str(const char *s) {
+  int len = strlen(s);
+  char* copy = malloc(len + 1);
+  memcpy(copy, s, len + 1);
+
   return copy;
 }
 

@@ -10,14 +10,14 @@ void make_suggests(WrongWord wword, Trie dictionary) {
   // attempts[0], las de distancia 2 en attempts[1], etc).
   HashTable attempts[MAX_SEARCH_DISTANCE - 1];
   for (int i = 0; i < MAX_SEARCH_DISTANCE - 1; ++i) {
-    attempts[i] = hashtable_init(100U, (CopyFunction) strdup,
+    attempts[i] = hashtable_init(100U, (CopyFunction) copy_str,
       (CompareFunction) strcmp, (DestroyFunction) free, (HashFunction) KRHash);
     assert(attempts[i] != NULL);
   }
   // Se prueban todas las combinaciones de operaciones o hasta completar las
   // sugerencias pedidas. A medida que se van generando posibles palabras, se
   // agregan en varias tablas de hash para luego evitar recalcularlas. 
-  stop = get_distance_1(wword, wword->word, dictionary, attempts[0]);//, 0, NULL);
+  stop = get_distance_1(wword, wword->word, dictionary, attempts[0], 0, NULL);
   for (unsigned d = 1; !stop && d < MAX_SEARCH_DISTANCE; ++d) {
     unsigned size = hashtable_size(attempts[d - 1]);
     char** elems = (char**) hashtable_elems(attempts[d - 1]);
@@ -29,9 +29,9 @@ void make_suggests(WrongWord wword, Trie dictionary) {
         continue;
       if (d == MAX_SEARCH_DISTANCE - 1)
         // No se inserta la palabra ya que no interesa la siguiente distancia
-        stop = get_distance_1(wword, suggest, dictionary, NULL);//, 0, NULL);
+        stop = get_distance_1(wword, suggest, dictionary, NULL, 0, NULL);
       else
-        stop = get_distance_1(wword, suggest, dictionary, attempts[d]);//, d, attempts);
+        stop = get_distance_1(wword, suggest, dictionary, attempts[d], d, attempts);
       if (stop)
         break;
     }

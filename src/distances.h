@@ -13,7 +13,7 @@
  * Retorna 1 si se han completado las sugerencias, 0 en caso contrario
 */
 int insert(WrongWord wword, char* str, unsigned len, Trie dictionary,
-              HashTable attempts);//, unsigned dist, HashTable prev_attempts[]);
+              HashTable attempts, unsigned dist, HashTable prev_attempts[]);
 
 /*
  * Regla de reemplazo: Todos los caracteres de str son reemplazados por otro
@@ -21,7 +21,7 @@ int insert(WrongWord wword, char* str, unsigned len, Trie dictionary,
  * Retorna 1 si se han completado las sugerencias, 0 en caso contrario
 */
 int replace(WrongWord wword, char* str, unsigned len, Trie dictionary,
-              HashTable attempts);//, unsigned dist, HashTable prev_attempts[]);
+              HashTable attempts, unsigned dist, HashTable prev_attempts[]);
 
 /*
  * Regla de trasposicion: Se alternan los caracteres adyacentes de la palabra
@@ -29,7 +29,7 @@ int replace(WrongWord wword, char* str, unsigned len, Trie dictionary,
  * Retorna 1 si se han completado las sugerencias, 0 en caso contrario
 */
 int swap(WrongWord wword, char* str, unsigned len, Trie dictionary,
-              HashTable attempts);//, unsigned dist, HashTable prev_attempts[]);
+              HashTable attempts, unsigned dist, HashTable prev_attempts[]);
 
 /*
  * Regla de eliminacion: Se elimina un caracter de la palabra. Si es una palabra
@@ -37,7 +37,7 @@ int swap(WrongWord wword, char* str, unsigned len, Trie dictionary,
  * Retorna 1 si se han completado las sugerencias, 0 en caso contrario
 */
 int delete(WrongWord wword, char* str, unsigned len, Trie dictionary,
-              HashTable attempts);//, unsigned dist, HashTable prev_attempts[]);
+              HashTable attempts, unsigned dist, HashTable prev_attempts[]);
 
 /*
  * Regla de separacion: Se divide el string en dos substrings separados por un
@@ -52,6 +52,6 @@ int split(WrongWord wword, char* str, unsigned len, Trie dictionary);
  * luego ser iterada y evitar recalcular estas
 */
 int get_distance_1(WrongWord wword, char* str, Trie dictionary,
-              HashTable attempts);//, unsigned dist, HashTable prev_attempts[]);
+              HashTable attempts, unsigned dist, HashTable prev_attempts[]);
 
 #endif // __DIST_H__
