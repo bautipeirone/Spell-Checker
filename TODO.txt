@@ -1,3 +1,0 @@
-* Reemplazar strcpy por memcpy // DONE
-* Modificar la operacion split para que no inserte a una tabla hash // DONE
-* Reañadir chequeo de duplicados ???
