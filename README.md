@@ -13,7 +13,23 @@ make debug
 Para ejecutar el corrector, se debe proveer el archivo a corregir y el nombre
 del archivo de salida, y ejectuarse como sigue
 ```
-./main entrada.txt output.txt
+./main entrada.txt salida.txt
+```
+
+A la hora de compilar, se puede pasar al compilador la bandera -DCHECK_DUP, lo que hará que el programa internamente lleve
+registro de las combinaciones previamente usadas, para asi, reducir en teoria el numero de palabras a probar en el caso de no encontrar todas las sugerencias pedidas.
+
+Esta opcion no es compilada por defecto, ya que en la practica ha 
+reducido el tiempo de ejecucion del programa para la mayoria de archivos con los que se probó.
+
+Si se quiere compilar con esta opcion, se puede ejecutar:
+```
+make clean
+make CHECK_DUP=1
+```
+o
+```
+make -B CHECK_DUP=1
 ```
 
 ## Descripcion
