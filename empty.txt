@@ -1,8 +1,0 @@
-a, 5, ca, da, ea, fa, ha
-y, 5, ay, ya, ye, yo, ja
-espanol, 5, es panoli, escamol, espalo, espanto, empano
-darle, 5, garle, parle, dable, dalle, arle
-espanoles, 5, etanoles, estan oles, esa anoles, despenoles, sepan oles
-andres, 5, landres, andares, adres, andes, aindies
-rafael, 5, rafal, rafa el, rafaila, gafa el, rabel
-dahskdkefdsd, 0
