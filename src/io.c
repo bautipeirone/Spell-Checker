@@ -5,7 +5,7 @@ void get_dict_path(char path[]) {
   scanf("%s", path);
 }
 
-int read_word(FILE* fp, char buf[MAX_LEN_WORD + 1], unsigned *line_number) {
+int read_word(FILE* fp, char buf[], unsigned *line_number) {
   int c, i = 0, stop = 0;
   // Se avanza hasta la proxima palabra
   do {
@@ -38,6 +38,47 @@ int read_word(FILE* fp, char buf[MAX_LEN_WORD + 1], unsigned *line_number) {
   return 1;
 }
 
+int read_number(FILE *fp) {
+  const int num_digits = 2; // Numero de digitos de NUM_SUGGESTS mas uno
+  int c, i = 0, stop = 0;
+  char num_buf[num_digits];
+  do
+    c = fgetc(fp);
+  while (!isdigit(c));
+  
+  num_buf[i++] = c;
+
+  while (i < num_digits - 1 && !stop) {
+    c = getc(fp);
+    if (isdigit(c))
+      num_buf[i++] = c;
+    else
+      stop = 1;
+  }
+
+  num_buf[i] = '\0';
+  return atoi(num_buf);
+}
+
+void read_suggestion(FILE *fp, char buf[]) {
+  int c, i = 0, stop = 0;
+  // Se avanza hasta la proxima palabra
+  do
+    c = fgetc(fp);
+  while (!isalpha(c));
+
+  buf[i++] = c;
+
+  while (i < MAX_LEN_WORD && !stop) {
+    c = getc(fp);
+    if (isalpha(c) || c == ' ')
+      buf[i++] = c;
+    else
+      stop = 1;
+  }
+  buf[i] = '\0';
+}
+
 void write_correction(WrongWord w, FILE *fp) {
   fputs("Lineas ", fp);
   while (!gqueue_empty(w->lines)) {
@@ -63,8 +104,26 @@ void write_corrections(const char *path, HashTable corrections) {
   fclose(fp);
 }
 
+void add_to_cachefile(WrongWord w, FILE *fp) {
+  if (w->from_cache)
+    return ;
+  fprintf(fp, "%s, %u", w->word, w->num);
+  for (int i = 0; i < w->num; i++) {
+    fprintf(fp, ", %s", w->suggests[i]);
+  }
+  fputc('\n', fp);
+}
+
+void update_cachefile(const char *path, HashTable corrections) {
+  FILE *fp = fopen(path, "a");
+  assert(fp != NULL);
+  hashtable_iterate(corrections, (VisitFunctionExtra) add_to_cachefile, fp);
+  fclose(fp);
+}
+
 void usage() {
   puts("Uso del programa:");
-  puts("./main <archivoEntrada> <archivoSalida>");
+  puts("./main <archivoEntrada> <archivoSalida> <archivoIntermedio>");
   exit(EXIT_FAILURE);
 }
+

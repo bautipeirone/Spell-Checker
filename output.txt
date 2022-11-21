@@ -1,0 +1,24 @@
+Lineas 20, "a" no esta en el diccionario
+Quizas quiso decir: ca, da, ea, fa, ha,
+
+Lineas 1, 8, 9, 12, 17, 19, 20, "y" no esta en el diccionario
+Quizas quiso decir: ay, ya, ye, yo, ja,
+
+Lineas 6, "dahskdkefdsd" no esta en el diccionario
+No se han encontrado sugerencias para la palabra
+
+Lineas 8, 16, "espanol" no esta en el diccionario
+Quizas quiso decir: es panoli, escamol, espalo, espanto, empano,
+
+Lineas 20, "darle" no esta en el diccionario
+Quizas quiso decir: garle, parle, dable, dalle, arle,
+
+Lineas 1, 3, 8, 13, "espanoles" no esta en el diccionario
+Quizas quiso decir: etanoles, estan oles, esa anoles, despenoles, sepan oles,
+
+Lineas 7, "andres" no esta en el diccionario
+Quizas quiso decir: landres, andares, adres, andes, aindies,
+
+Lineas 16, 19, "rafael" no esta en el diccionario
+Quizas quiso decir: rafal, rafa el, rafaila, gafa el, rabel,
+

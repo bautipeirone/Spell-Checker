@@ -3,6 +3,29 @@
 #include "distances.h"
 #include "../structures/hashtable.h"
 
+HashTable read_cachefile(const char *path) {
+  FILE *fp = fopen(path, "r");
+  char word_buf[MAX_LEN_WORD + 1];
+  unsigned _line_n;
+  HashTable cached_corrections = hashtable_init(100, id,
+      (CompareFunction) cmp_wrongword, (DestroyFunction) free_wrongword,
+      (HashFunction) hash_wrongword);
+
+  while (read_word(fp, word_buf, &_line_n)) {
+    WrongWord w = init_wrongword(word_buf); //lines no se utiliza en esta tabla
+    w->num = read_number(fp); // Numero de sugerencias
+    w->from_cache = 1;
+    for (int i = 0; i < w->num; i++) {
+      read_suggestion(fp, word_buf);
+      w->suggests[i] = copy_str(word_buf);
+    }
+    hashtable_insert(cached_corrections, w);
+  }
+
+  fclose(fp);
+  return cached_corrections;
+}
+
 void make_suggests(WrongWord wword, Trie dictionary) {
   int stop = 0;
   // Arreglo de tablas donde se insertaran las palabras probadas segun su
@@ -40,7 +63,7 @@ void make_suggests(WrongWord wword, Trie dictionary) {
     hashtable_free(attempts[i]);
 }
 
-HashTable check_file(const char* input, Trie dictionary) {
+HashTable check_file(const char* input, Trie dictionary, HashTable cache) {
   FILE *fp = fopen(input, "r");
   assert(fp != NULL);
   char buf[MAX_LEN_WORD + 1];
@@ -64,11 +87,19 @@ HashTable check_file(const char* input, Trie dictionary) {
 
     WrongWord w2 = hashtable_search(incorrect_words, &w1);
 
-    // Si la palabra no fue previamente corregida, se generan sus sugerencias
-    // y se añade a la tabla de correciones
+    /*
+    Si la palabra no fue previamente corregida durante la ejecucion del
+    programa, hay dos opciones:
+      1 - La palabra y sus sugerencias se encuentran en el archivo intermedio
+      2 - Se generan sus sugerencias
+    */
     if (w2 == NULL) {
-      w2 = init_wrongword(buf);
-      make_suggests(w2, dictionary);
+      w2 = hashtable_search(cache, &w1);
+      if (w2 == NULL) {
+        w2 = init_wrongword(buf);
+        make_suggests(w2, dictionary);
+      } else
+        w2 = copy_wrongword(w2);
       hashtable_insert(incorrect_words, w2);
     }
     // Se añade la linea en que aparece

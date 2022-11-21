@@ -9,6 +9,8 @@ typedef struct _WrongWord {
 	char *word;                   // Palabra
 	char *suggests[NUM_SUGGESTS]; // Arreglo de sugerencias
 	int num;                      // Numero de sugerencias hechas
+  char from_cache;              // 1 si las sugerencias vienen del archivo cache
+                                // 0 si se calculan internamente en el programa
   GQueue lines;                 // Numeros de linea donde aparece la palabra
 } *WrongWord;
 
@@ -23,6 +25,13 @@ WrongWord init_wrongword(const char *str);
  * de cada campo.
 */
 int cmp_wrongword(WrongWord w1, WrongWord w2);
+
+/*
+ * Retorna una copia de una estructura WrongWord. Tanto la palabra como las
+ * sugerencias se alocan en heap. Por conveniencia y eficiencia, lo unico que
+ * no se copia es la lista lines.
+*/
+WrongWord copy_wrongword(WrongWord w);
 
 /*
  * Destruye una estructura WrongWord.

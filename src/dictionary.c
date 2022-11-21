@@ -6,12 +6,26 @@ WrongWord init_wrongword(const char *str) {
   assert(w != NULL);
   w->lines = gqueue_init();
   w->num = 0;
+  w->from_cache = 0;
   w->word = copy_str(str);
   return w;
 }
 
 inline int cmp_wrongword(WrongWord w1, WrongWord w2) {
   return strcmp(w1->word, w2->word);
+}
+
+// No se copia la lista enlazada, se deja en NULL por conveniencia
+WrongWord copy_wrongword(WrongWord w) {
+  WrongWord copy = malloc(sizeof(struct _WrongWord));
+  assert(copy != NULL);
+  copy->lines = gqueue_init();
+  copy->num = w->num;
+  copy->from_cache = w->from_cache;
+  copy->word = copy_str(w->word);
+  for (int i = 0; i < w->num; i++)
+    copy->suggests[i] = copy_str(w->suggests[i]);
+  return copy;
 }
 
 void free_wrongword(WrongWord w) {
