@@ -98,9 +98,8 @@ void* hashtable_search(HashTable table, void *data) {
   for (unsigned i = 0; !stop && i < table->size; ++i) {
     if (table->elems[idx] == NULL)
       stop = 1;
-    else if (table->elems[idx] == REMOVED)
-      continue;
-    else if (table->cmp(table->elems[idx], data) == 0)
+    else if (table->elems[idx] != REMOVED
+          && table->cmp(table->elems[idx], data) == 0)
       return table->elems[idx];
     idx = (idx + 1) % table->size;
   }
@@ -114,10 +113,9 @@ void hashtable_remove(HashTable table, void *data) {
   for (unsigned i = 0; i < table->size; ++i) {
     if (table->elems[idx] == NULL)
       return;
-    else if (table->elems[idx] == REMOVED)
-      continue;
     // Vaciar la casilla si hay coincidencia.
-    else if (table->cmp(table->elems[idx], data) == 0) {
+    else if (table->elems[idx] != REMOVED
+          && table->cmp(table->elems[idx], data) == 0) {
       table->num_elems--;
       table->destroy(table->elems[idx]);
       // Marcar la casilla con el puntero REMOVED
